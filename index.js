@@ -34,8 +34,8 @@ app.use(
 );
 
 routers(app);
-
 app.use(function (res, req, next) {
+    if (res.path.indexOf('/favicon.ico') != -1) next();
     var err = new Error();
     err.status = 404;
     err.message = `Not Found !`;
@@ -51,7 +51,7 @@ app.use(function (err, req, res, next) {
     console.error(err.stack);
 });
 const server = http.createServer(app);
-server.listen(config.port);
+server.listen(process.env.PORT || config.port);
 server.on("error", function (error) {
     throw new Error(error);
 });

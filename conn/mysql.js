@@ -39,11 +39,10 @@ class MysqlModel {
 }
 
 async function mysqlDBUtil() {
-
     try {
         const db = new MysqlModel();
         const [conn, pool] = await db.getConnection();
-        log(46, 'mysql连接成功：' + conn)
+        log(46, 'mysql连接成功')
         /**
          * 回滚事务
          */

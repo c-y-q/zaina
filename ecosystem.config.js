@@ -1,10 +1,10 @@
 module.exports = {
     apps: [{
         name: "hbzner",
-        script: "./bin/www",
+        script: "./index.js",
         watch: true,
         env_dev: {
-            "PORT": 3000,
+            "PORT": 7006,
             "NODE_ENV": "dev"
         },
         env_prod: {
