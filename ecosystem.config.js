@@ -1,6 +1,6 @@
 module.exports = {
     apps: [{
-        name: "hbzner",
+        name: "zaina",
         script: "./index.js",
         watch: true,
         env_dev: {
