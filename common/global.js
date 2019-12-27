@@ -11,6 +11,7 @@ global.mongodbConn = require('../conn/mongodb');
 global.mongoModel = require('../mongoModel/model');
 global.moment = require('moment');
 global.tools = require('../tools/tool');
+global.validate = require('../tools/validate');
 if (!global.cert) {
     const privateKey = fs.readFileSync(`${process.cwd()}/cert/privkey.pem`).toString();
     const publicKey = fs.readFileSync(`${process.cwd()}/cert/public.pem`).toString();

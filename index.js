@@ -4,9 +4,9 @@ const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const bodyParser = require("body-parser");
 const app = express();
+require('./middlewares/catchError');
 require("./common/global");
 const routers = require('./router/index');
-require('./middlewares/catchError');
 app.use(logger("dev"));
 app.use(express.json()).use(
     express.urlencoded({

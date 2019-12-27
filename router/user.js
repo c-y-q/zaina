@@ -1,10 +1,29 @@
-const userService = require("../service/user/user");
+const userService = require("../service/user");
 /**
  * 在哪app用户
  */
 
 router.post("/login", async (req, res) => {
-  const account = req.body.account;
+  const {
+    account,
+    vcode
+  } = req.body;
+  if (!validate.phone(account)) {
+    res.json({
+      status: 401,
+      msg: " 手机格式错误！"
+    })
+    return;
+  }
+  const key = `verify_code${account}`;
+  const sendSmsCode = await cache.get(key);
+  if (sendSmsCode != vcode) {
+    res.json({
+      status: 402,
+      msg: '验证码错误！'
+    })
+    return;
+  }
   await userService.findUser(account);
   const audience = tools.md5(account);
   const tokenParam = {
@@ -20,9 +39,42 @@ router.post("/login", async (req, res) => {
     token
   });
 });
-router.get('/getData', async (req, res) => {
+
+/**
+ * 发送手机验证码
+ */
+router.post('/sendSMS', async (req, res, next) => {
+  const account = req.body.account;
+  if (!validate.phone(account)) {
+    res.json({
+      status: 401,
+      msg: " 手机格式错误！"
+    })
+    return
+  }
+  const key = `verify_code${account}`;
+  const sendSmsCode = await cache.get(key);
+  if (sendSmsCode) {
+    res.json({
+      status: 405,
+      msg: '验证码已发送，请2分钟后重试！'
+    })
+    return;
+  }
+  const [data, vcode] = await tools.sendSMS(account);
+  if (!(data.data && data.data.Code == 'OK')) {
+    res.json({
+      status: 201,
+      msg: '验证码发送失败，请稍后重试！'
+    })
+    return;
+  }
   res.json({
-    result: 'pl'
+    status: 200,
+    msg: '验证码发送成功,请注意查收！'
   })
+  cache.set(key, vcode, 'EX', 60 * 2);
 })
+
+
 module.exports = router;
