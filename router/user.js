@@ -1,5 +1,3 @@
-const express = require('express');
-const router = express.Router();
 router.get('/getData', async (req, res) => {
     const db = await mysqlUtil();
     const sql = 'select * from wx_order where id =1';

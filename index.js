@@ -8,8 +8,7 @@ require("./common/global");
 const routers = require('./router/index');
 require('./middlewares/catchError');
 app.use(logger("dev"));
-app.use(express.json());
-app.use(
+app.use(express.json()).use(
     express.urlencoded({
         extended: false
     })
@@ -21,18 +20,47 @@ app.use(
         limit: "100mb",
         extended: false
     })
-);
-app.use(
+).use(
     bodyParser.raw({
         limit: "100mb"
     })
-);
-app.use(
+).use(
     bodyParser.text({
         limit: "100mb"
     })
 );
 
+/**
+ * 将参数接收方式统一改为req.body
+ */
+app.use(function (req, res, next) {
+    req.body = req.method == 'GET' ? req.query : req.method == 'POST' ? req.body : req.param;
+    console.log(38, req.body)
+    next();
+})
+
+/**
+ * 校验token
+ */
+app.use(function (req, res, next) {
+    if (config.noToken.includes(req.path)) {
+        const token = req.headers.token || req.body.token || '';
+        const tokenObj = tools.verifyToken(token, cert.public);
+        const userName = tokenObj && tokenObj.userName || '';
+        if (tokenObj && tokenObj.uuid == caches.get(userName)) {
+            next()
+        } else {
+            throw {
+                status: 403,
+                router: req.url,
+                respMsg: 'token is wrong!',
+            }
+            return;
+        }
+    } else {
+        next();
+    }
+})
 routers(app);
 app.use(function (res, req, next) {
     if (res.path.indexOf('/favicon.ico') != -1) next();
