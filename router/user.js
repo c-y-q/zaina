@@ -1,17 +1,28 @@
+const userService = require("../service/user/user");
+/**
+ * 在哪app用户
+ */
+
+router.post("/login", async (req, res) => {
+  const account = req.body.account;
+  await userService.findUser(account);
+  const audience = tools.md5(account);
+  const tokenParam = {
+    account,
+    uuid: tools.uuid(),
+    visitIP: req.ip,
+    audience,
+    expires: new Date().getTime()
+  }
+  const token = tools.createToken(tokenParam, cert.private);
+  cache.set(audience, JSON.stringify(tokenParam), 'EX', 60 * 120);
+  res.json({
+    token
+  });
+});
 router.get('/getData', async (req, res) => {
-    const db = await mysqlUtil();
-    const sql = 'select * from wx_order where id =1';
-    const user = await mongoModel.user.find({});
-    const infolist = await mongoModel.infolist.find({})
-    const result = await db.query(sql);
-    await db.close();
-    res.json({
-        // result: result,
-        // user
-        infolist
-    })
+  res.json({
+    result: 'pl'
+  })
 })
-
-
-
 module.exports = router;

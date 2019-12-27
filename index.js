@@ -42,48 +42,48 @@ app.use(function (req, res, next) {
 /**
  * 校验token
  */
-app.use(function (req, res, next) {
+app.use(async function (req, res, next) {
     if (config.noToken.includes(req.path)) {
-        const token = req.headers.token || req.body.token || '';
-        const tokenObj = tools.verifyToken(token, cert.public);
-        const userName = tokenObj && tokenObj.userName || '';
-        if (tokenObj && tokenObj.uuid == caches.get(userName)) {
-            next()
-        } else {
-            throw {
-                status: 403,
-                router: req.url,
-                respMsg: 'token is wrong!',
-            }
-            return;
-        }
+        next()
     } else {
-        next();
+        try {
+            const token = req.headers.token || req.body.token || req.query.token;
+            const tokenObj = tools.verifyToken(token, cert.public);
+            console.log(52, tokenObj)
+            const userName = tokenObj && tokenObj.audience || '';
+            const redisUserInfo = await cache.get(userName);
+            req.user = tokenObj;
+            const userStr = redisUserInfo && JSON.parse(redisUserInfo);
+            console.log(57, userStr)
+            if (!redisUserInfo || !(tokenObj.visitIP == userStr.visitIP && userStr.visitIP == req.ip && tokenObj.audience == userStr.audience && tokenObj.uuid == userStr.uuid)) {
+                let err = tools.throwError(403, 'token is wrong !');
+                next(err);
+            } else {
+                next();
+            }
+        } catch (error) {
+            next(error)
+        }
     }
 })
 routers(app);
 app.use(function (res, req, next) {
     if (res.path.indexOf('/favicon.ico') != -1) next();
-    var err = new Error();
-    err.status = 404;
-    err.message = `Not Found !`;
+    let err = tools.throwError(404, 'Not Found !');
     next(err);
 });
 app.use(function (err, req, res, next) {
-    res.json({
+    let eggMsg = {
         status: err.status || 500,
-        router: req.url,
-        respMsg: err.respMsg,
+        router: req.path,
+        respMsg: err.message,
         error: err.stack
-    });
-    console.error(err.stack);
+    }
+    process.env.NODE_ENV == 'dev' ? res.json(eggMsg) : res.json(err);
+    console.error(83, eggMsg);
 });
 const server = http.createServer(app);
 server.listen(process.env.PORT || config.port);
-server.on("error", function (error) {
-    throw new Error(error);
-});
-
 server.on("listening", function () {
     const addr = server.address();
     console.log(`app listen on port ${addr.port}.......+++++ 当前运行的环境是：${process.env.NODE_ENV}`);

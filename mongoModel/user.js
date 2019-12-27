@@ -1,12 +1,10 @@
-    const Schema = mongoose.Schema;
-    module.exports = new mongoose.Schema({
-        username: {
-            type: String
-        },
-        password: {
-            type: String
-        },
-    }, {
-
-        collection: 'users'
-    });
+module.exports = new mongoose.Schema(
+  {
+    userName: {
+      type: String
+    }
+  },
+  {
+    collection: "zaina_app_user"
+  }
+);
