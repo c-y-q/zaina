@@ -1,5 +1,6 @@
 const configEnvPath = `../config/${process.env.ENV || 'dev'}`;
 const express = require('express');
+global.axios = require('axios');
 global.fs = require('fs');
 global.router = express.Router();
 global.config = require(`${configEnvPath}`);
