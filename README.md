@@ -1,6 +1,6 @@
 # zaina
 
-#### 启动
+#### 1.启动
 
 > > > > 测试：./fly dev 或者 npm start
 
