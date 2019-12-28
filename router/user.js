@@ -3,6 +3,9 @@ const userService = require("../service/user");
  * 在哪app用户
  */
 
+/**
+ * 登录
+ */
 router.post("/login", async (req, res) => {
   const {
     account,
@@ -74,7 +77,21 @@ router.post('/sendSMS', async (req, res, next) => {
     msg: '验证码发送成功,请注意查收！'
   })
   cache.set(key, vcode, 'EX', 60 * 2);
+
 })
 
+/**
+ * 退出登录
+ */
+router.post('/logout', async (req, res, next) => {
+
+  const audience = req.user.audience;
+  await cache.del(audience);
+  res.json({
+    status: 200,
+    msg: '已退出登录！'
+  })
+
+})
 
 module.exports = router;
