@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 const uuid = require('uuid/v4');
 const crypto = require('crypto');
-const axios = require('axios');
 /**
  * 生成登录token
  */
