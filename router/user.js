@@ -44,7 +44,7 @@ router.post("/login", async (req, res) => {
     expires: new Date().getTime()
   }
   const token = tools.createToken(tokenParam, cert.private);
-  cache.set(audience, JSON.stringify(tokenParam), 'EX', 60 * 120);
+  cache.set(audience, JSON.stringify(tokenParam), 'EX', 60 * 120 * 1000);
   res.json({
     token
   });

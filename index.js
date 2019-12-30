@@ -76,7 +76,7 @@ app.use(function (err, req, res, next) {
     let eggMsg = {
         status: err.status || 500,
         router: req.path,
-        respMsg: err.message,
+        respMsg: err.respMsg,
         error: err.stack
     }
     process.env.NODE_ENV == 'dev' ? res.json(eggMsg) : res.json(err);

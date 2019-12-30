@@ -10,10 +10,9 @@ router.post('/getPetInfo', async (req, res, next) => {
 
 router.post("/directBindDogRegNum", async (req, res) => {
     const phone = req.user.account;
-
     let isfree = await petService.isPetMaster(phone);
       if (isfree.length > 0) {
-        console.log("验证通过!");
+        log("验证通过!");
       } else {
         res.json({
           status: 10011,
@@ -30,13 +29,13 @@ router.post("/directBindDogRegNum", async (req, res) => {
         respMsg: " 已绑定过该号码，请勿重复绑定 !"
       };
     }
-    // const judePetExists = await petService.judePetExists(isfree[0].id);
-    // if (!judePetExists) {
-    //   throw {
-    //     status: 10011,
-    //     respMsg: " the dog not exists !"
-    //   };
-    // }
+    const judePetExists = await petService.judePetExists(isfree[0].id);
+    if (!judePetExists) {
+      throw {
+        status: 10011,
+        respMsg: " the dog not exists !"
+      };
+    }
     await petService.directBindDogRegNum(
       isfree[0].id,
       isfree[0].dogRegNum
