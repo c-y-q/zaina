@@ -15,7 +15,7 @@ router.post("/directBindDogRegNum", async (req, res) => {
         log("验证通过!");
       } else {
         res.json({
-          status: 10011,
+          status: 405,
           respMsg: "验证失败!"
         });
       }
@@ -25,14 +25,14 @@ router.post("/directBindDogRegNum", async (req, res) => {
     );
     if (flag.length > 0) {
       throw {
-        status: 10011,
+        status: 405,
         respMsg: " 已绑定过该号码，请勿重复绑定 !"
       };
     }
     const judePetExists = await petService.judePetExists(isfree[0].id);
     if (!judePetExists) {
       throw {
-        status: 10011,
+        status: 405,
         respMsg: " the dog not exists !"
       };
     }
