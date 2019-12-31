@@ -1,10 +1,11 @@
-require('./middlewares/catchError');
 require("./common/global");
+require('./middlewares/catchError');
 const express = require("express");
 const http = require("http");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const bodyParser = require("body-parser");
+
 const app = express();
 const routers = require('./router/index');
 app.use(logger("dev"));
@@ -35,7 +36,7 @@ app.use(
  */
 app.use(function (req, res, next) {
     req.body = req.method == 'GET' ? req.query : req.method == 'POST' ? req.body : req.param;
-    console.log(38, req.body)
+    log(38, req.body)
     next();
 })
 
@@ -49,7 +50,7 @@ app.use(async function (req, res, next) {
         try {
             const token = req.headers.token || req.body.token || req.query.token;
             const tokenObj = tools.verifyToken(token, cert.public);
-            console.log(52, tokenObj)
+            log(52, tokenObj)
             const userName = tokenObj && tokenObj.audience || '';
             const redisUserInfo = await cache.get(userName);
             req.user = tokenObj;
@@ -60,8 +61,8 @@ app.use(async function (req, res, next) {
             } else {
                 next();
             }
-        } catch (error) {
-            next(error)
+        } catch (err) {
+            next(err)
         }
     }
 })
@@ -75,9 +76,10 @@ app.use(function (err, req, res, next) {
     let errMsg = {
         status: err.status || 500,
         router: req.path,
-        respMsg: err.message,
-        error: err.stack
+        msg: err.message
     }
+    process.env.NODE_ENV == 'dev' ? errMsg.error = err.stack : errMsg.error = err.message;
+    res.json(errMsg);
     console.error(83, errMsg);
 });
 const server = http.createServer(app);
