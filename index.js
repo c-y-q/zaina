@@ -1,11 +1,12 @@
+require("./common/global");
+require('./middlewares/catchError');
 const express = require("express");
 const http = require("http");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const bodyParser = require("body-parser");
+
 const app = express();
-require('./middlewares/catchError');
-require("./common/global");
 const routers = require('./router/index');
 app.use(logger("dev"));
 app.use(express.json()).use(
@@ -35,7 +36,7 @@ app.use(
  */
 app.use(function (req, res, next) {
     req.body = req.method == 'GET' ? req.query : req.method == 'POST' ? req.body : req.param;
-    console.log(38, req.body)
+    log(38, req.body)
     next();
 })
 
@@ -49,20 +50,19 @@ app.use(async function (req, res, next) {
         try {
             const token = req.headers.token || req.body.token || req.query.token;
             const tokenObj = tools.verifyToken(token, cert.public);
-            console.log(52, tokenObj)
+            log(52, tokenObj)
             const userName = tokenObj && tokenObj.audience || '';
             const redisUserInfo = await cache.get(userName);
             req.user = tokenObj;
             const userStr = redisUserInfo && JSON.parse(redisUserInfo);
-            console.log(57, userStr)
             if (!redisUserInfo || !(tokenObj.visitIP == userStr.visitIP && userStr.visitIP == req.ip && tokenObj.audience == userStr.audience && tokenObj.uuid == userStr.uuid)) {
                 let err = tools.throwError(403, 'token is wrong ');
                 next(err);
             } else {
                 next();
             }
-        } catch (error) {
-            next(error)
+        } catch (err) {
+            next(err)
         }
     }
 })
@@ -73,14 +73,15 @@ app.use(function (res, req, next) {
     next(err);
 });
 app.use(function (err, req, res, next) {
-    let eggMsg = {
+    let errMsg = {
         status: err.status || 500,
         router: req.path,
         respMsg: err.respMsg,
         error: err.stack
     }
-    process.env.NODE_ENV == 'dev' ? res.json(eggMsg) : res.json(err);
-    console.error(83, eggMsg);
+    process.env.NODE_ENV == 'dev' ? errMsg.error = err.stack : errMsg.error = err.message;
+    res.json(errMsg);
+    console.error(83, errMsg);
 });
 const server = http.createServer(app);
 server.listen(process.env.PORT || config.port);

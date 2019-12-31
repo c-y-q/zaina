@@ -13,8 +13,8 @@ class MysqlModel {
             defaultSelector: "RR" //RR,RANDOM,ORDER
         });
         const mysqlNodes = this.mysqlConfig;
-        for (let node in (mysqlNodes)) {
-            poolCluster.add(`"${node}"`, mysqlNodes[`${node}`]);
+        for (let node in mysqlNodes) {
+            poolCluster.add(`${node}`, mysqlNodes[`${node}`]);
         }
         return new Promise((resolve, reject) => {
             poolCluster.getConnection(function (err, connection) {
