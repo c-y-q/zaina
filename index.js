@@ -1,11 +1,11 @@
+require('./middlewares/catchError');
+require("./common/global");
 const express = require("express");
 const http = require("http");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const bodyParser = require("body-parser");
 const app = express();
-require('./middlewares/catchError');
-require("./common/global");
 const routers = require('./router/index');
 app.use(logger("dev"));
 app.use(express.json()).use(
@@ -54,7 +54,6 @@ app.use(async function (req, res, next) {
             const redisUserInfo = await cache.get(userName);
             req.user = tokenObj;
             const userStr = redisUserInfo && JSON.parse(redisUserInfo);
-            console.log(57, userStr)
             if (!redisUserInfo || !(tokenObj.visitIP == userStr.visitIP && userStr.visitIP == req.ip && tokenObj.audience == userStr.audience && tokenObj.uuid == userStr.uuid)) {
                 let err = tools.throwError(403, 'token is wrong !');
                 next(err);
@@ -73,14 +72,13 @@ app.use(function (res, req, next) {
     next(err);
 });
 app.use(function (err, req, res, next) {
-    let eggMsg = {
+    let errMsg = {
         status: err.status || 500,
         router: req.path,
         respMsg: err.message,
         error: err.stack
     }
-    process.env.NODE_ENV == 'dev' ? res.json(eggMsg) : res.json(err);
-    console.error(83, eggMsg);
+    console.error(83, errMsg);
 });
 const server = http.createServer(app);
 server.listen(process.env.PORT || config.port);
