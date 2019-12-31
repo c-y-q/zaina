@@ -56,7 +56,7 @@ app.use(async function (req, res, next) {
             const userStr = redisUserInfo && JSON.parse(redisUserInfo);
             console.log(57, userStr)
             if (!redisUserInfo || !(tokenObj.visitIP == userStr.visitIP && userStr.visitIP == req.ip && tokenObj.audience == userStr.audience && tokenObj.uuid == userStr.uuid)) {
-                let err = tools.throwError(403, 'token is wrong !');
+                let err = tools.throwError(403, 'token is wrong ');
                 next(err);
             } else {
                 next();
@@ -69,7 +69,7 @@ app.use(async function (req, res, next) {
 routers(app);
 app.use(function (res, req, next) {
     if (res.path.indexOf('/favicon.ico') != -1) next();
-    let err = tools.throwError(404, 'Not Found !');
+    let err = tools.throwError(404, 'Not Found ');
     next(err);
 });
 app.use(function (err, req, res, next) {

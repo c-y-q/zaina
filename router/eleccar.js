@@ -8,12 +8,13 @@ const eleccarService = require("../service/eleccar");
  * 获取电车列表
  */
 router.post('/getElecCarList', async (req, res) => {
-    const carToken = req.user.cartoken;
+    let carToken = req.user.cartoken;
     const carUserId = req.user.carUserId;
     const carUserInfo = await eleccarService.getElecticCarUserInfo(carUserId, carToken);
     if (!carUserInfo || carUserInfo.length == 0 || carUserInfo.usersOfSys.length == 0) {
         return [];
     }
+
     const carUserIdNum = carUserInfo.usersOfSys.map(obj => obj.account);
     const result = await eleccarService.getElecCarList(carUserIdNum, carToken);
     res.json({

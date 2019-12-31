@@ -19,7 +19,7 @@ exports.getElecCarList = async (idNum, carToken) => {
 exports.getElecticCarUserInfo = async (carUserId, carToken) => {
     const result = await axios({
         method: 'get',
-        url: `https://api.hbzner.com/v1/users/${carUserId}}`,
+        url: `https://api.hbzner.com/v1/users/${carUserId}`,
         headers: {
             'authorization': carToken
         }

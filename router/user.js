@@ -3,6 +3,38 @@
  */
 
 const userService = require("../service/user");
+const petService = require('../service/petInfo');
+const eleccarService = require("../service/eleccar");
+
+
+
+router.post("/news", async (req, res) => {
+  const carToken = req.user.cartoken;
+  const carUserId = req.user.carUserId;
+  const phone = req.user.account;
+
+  const pet = await petService.getPetInfo(phone);
+  log('犬只信息：', pet);
+
+  const user = await userService.findUser(phone);
+  log('人员信息：', user);
+
+  const carUserInfo = await eleccarService.getElecticCarUserInfo(carUserId, carToken);
+  log('carUserInfo', carUserInfo);
+  if (!carUserInfo || carUserInfo.length == 0 || carUserInfo.usersOfSys.length == 0) {
+      return [];
+  }
+  const carUserIdNum = carUserInfo.usersOfSys.map(obj => obj.account);
+  const eleccar = await eleccarService.getElecCarList(carUserIdNum[0], carToken);
+  log('车辆信息：', eleccar);
+
+  res.json({
+    status: 200,
+    pet,
+    eleccar,
+    user
+  });
+})
 
 /**
  * 登录
@@ -15,7 +47,7 @@ router.post("/login", async (req, res) => {
   if (!validate.phone(account)) {
     res.json({
       status: 401,
-      msg: " 手机格式错误！"
+      msg: " 手机格式错误"
     })
     return;
   }
@@ -43,6 +75,7 @@ router.post("/login", async (req, res) => {
     audience,
     expires: new Date().getTime()
   }
+  log(46, tokenParam);
   const token = tools.createToken(tokenParam, cert.private);
   cache.set(audience, JSON.stringify(tokenParam), 'EX', 60 * 120 * 1000);
   res.json({
@@ -58,7 +91,7 @@ router.post('/sendSMS', async (req, res, next) => {
   if (!validate.phone(account)) {
     res.json({
       status: 401,
-      msg: " 手机格式错误！"
+      msg: " 手机格式错误"
     })
     return;
   }
@@ -67,7 +100,7 @@ router.post('/sendSMS', async (req, res, next) => {
   if (sendSmsCode) {
     res.json({
       status: 405,
-      msg: '验证码已发送，请2分钟后重试！'
+      msg: '验证码已发送，请2分钟后重试'
     })
     return;
   }
@@ -78,13 +111,13 @@ router.post('/sendSMS', async (req, res, next) => {
   if (sendSMsRes && sendSMsRes.data && sendSMsRes.data.times == 3) {
     res.json({
       status: 405,
-      msg: " 验证码发送次数已达到最大限制！"
+      msg: " 验证码发送次数已达到最大限制"
     })
     return;
   }
   res.json({
     status: 200,
-    msg: '验证码发送成功,请注意查收！'
+    msg: '验证码发送成功,请注意查收'
   })
 
 })
