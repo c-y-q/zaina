@@ -41,6 +41,7 @@ router.post("/directBindDogRegNum", async (req, res) => {
       isfree[0].dogRegNum
     );
     res.json({
+      
       status: 200,
       respMsg: "bind success "
     });
