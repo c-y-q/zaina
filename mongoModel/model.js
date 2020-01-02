@@ -3,13 +3,19 @@ const famlilyClasses = require("./famlilyClasses");
 const famlilyUser = require("./famlilyUser");
 const famlilyStudents = require("./famlilyStudents");
 const famlilyScore = require("./famlilyScore");
+const famlilyHomework = require("./famlilyHomework");
+const famlilyBulletins = require('./famlilyBulletins');
+const famlilyHomeworkAnswer = require("./famlilyHomeworkAnswer");
 const [conn, famlily] = require('../conn/mongodb');
 const schemasModel = {
   user,
   famlilyClasses,
   famlilyUser,
   famlilyStudents,
-  famlilyScore
+  famlilyScore,
+  famlilyHomework,
+  famlilyBulletins,
+  famlilyHomeworkAnswer
 };
 const Models = {};
 for (let name in schemasModel) {

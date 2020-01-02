@@ -53,12 +53,12 @@ app.use(async function (req, res, next) {
             log(52, tokenObj)
             const userName = tokenObj && tokenObj.audience || '';
             const redisUserInfo = await cache.get(userName);
-            req.user = tokenObj;
             const userStr = redisUserInfo && JSON.parse(redisUserInfo);
             if (!redisUserInfo || !(tokenObj.visitIP == userStr.visitIP && userStr.visitIP == req.ip && tokenObj.audience == userStr.audience && tokenObj.uuid == userStr.uuid)) {
                 let err = tools.throwError(403, 'token is wrong !');
                 next(err);
             } else {
+                req.user = userStr;
                 next();
             }
         } catch (err) {
