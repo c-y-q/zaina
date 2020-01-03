@@ -1,25 +1,25 @@
 {
-    "name": "hbzaina",
-    "version": "0.0.0",
-    "private": true,
-    "main": "index.js",
-    "scripts": {
-        "start": "export NODE_ENV='dev'&& nodemon",
-        "prod": "export NODE_ENV = 'prod' && nodemon"
-    },
-    "dependencies": {
-        "axios": "^0.19.0",
-        "body-parser": "^1.19.0",
-        "cookie-parser": "^1.4.4",
-        "debug": "~2.6.9",
-        "express": "^4.16.4",
-        "ioredis": "^4.14.1",
-        "jsonwebtoken": "^8.5.1",
-        "log4js": "^6.1.0",
-        "moment": "^2.24.0",
-        "mongoose": "^5.8.3",
-        "morgan": "^1.9.1",
-        "mysql2": "^2.1.0",
-        "uuid": "^3.3.3"
-    }
+  "name": "zaina",
+  "version": "0.0.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "start": "export NODE_ENV='dev'&& nodemon",
+    "prod": "export NODE_ENV = 'prod' && nodemon"
+  },
+  "dependencies": {
+    "axios": "^0.19.0",
+    "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.4",
+    "debug": "~2.6.9",
+    "express": "^4.16.4",
+    "ioredis": "^4.14.1",
+    "jsonwebtoken": "^8.5.1",
+    "log4js": "^6.1.0",
+    "moment": "^2.24.0",
+    "mongoose": "^5.8.3",
+    "morgan": "^1.9.1",
+    "mysql2": "^2.1.0",
+    "uuid": "^3.3.3"
+  }
 }

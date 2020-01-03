@@ -55,7 +55,7 @@ app.use(async function (req, res, next) {
             const redisUserInfo = await cache.get(userName);
             const userStr = redisUserInfo && JSON.parse(redisUserInfo);
             if (!redisUserInfo || !(tokenObj.visitIP == userStr.visitIP && userStr.visitIP == req.ip && tokenObj.audience == userStr.audience && tokenObj.uuid == userStr.uuid)) {
-                let err = tools.throwError(403, 'token is wrong ');
+                let err = tools.throwError(403, 'token is wrong !');
                 next(err);
             } else {
                 req.user = userStr;
@@ -76,8 +76,7 @@ app.use(function (err, req, res, next) {
     let errMsg = {
         status: err.status || 500,
         router: req.path,
-        respMsg: err.respMsg,
-        error: err.stack
+        msg: err.message
     }
     process.env.NODE_ENV == 'dev' ? errMsg.error = err.stack : errMsg.error = err.message;
     res.json(errMsg);

@@ -33,7 +33,6 @@ exports.findChildrenByParentPhone = async (account) => {
      * 有学生，查询得分情况
      */
     const classesInfos = JSON.parse(JSON.stringify(classesParents).replace(/(studentId)/g, 'student'));
-
     for (const i = 0; i < classesInfos.length; i++) {
         const parents = classesInfos[i].parents;
         for (const p = 0; p < parents.length; p++) {
@@ -46,7 +45,6 @@ exports.findChildrenByParentPhone = async (account) => {
                 subject: 1,
                 behavior: 1
             })
-
             /**
              * 为得分的行为分组，积极的，
              */
@@ -61,14 +59,12 @@ exports.findChildrenByParentPhone = async (account) => {
                     }
                 }
             }
-
             classesInfos[i].parents[p].student.score = {
                 jieji,
                 xiaoji
             };
         }
     }
-
     return classesInfos;
 }
 

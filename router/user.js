@@ -93,7 +93,6 @@ router.post("/login", async (req, res) => {
     audience,
     expires: new Date().getTime()
   }
-  log(46, tokenParam);
   const token = tools.createToken(tokenParam, cert.private);
   cache.set(audience, JSON.stringify(tokenParam), 'EX', 60 * 120 * 1000);
   res.json({
@@ -104,7 +103,7 @@ router.post("/login", async (req, res) => {
 /**
  * 发送手机验证码
  */
-router.post('/sendSMS', async (req, res, next) => {
+router.post('/sendSMS', async (req, res) => {
   const account = req.body.account;
   if (!validate.phone(account)) {
     res.json({
@@ -143,7 +142,7 @@ router.post('/sendSMS', async (req, res, next) => {
 /**
  * 退出登录
  */
-router.post('/logout', async (req, res, next) => {
+router.post('/logout', async (req, res) => {
   const audience = req.user.audience;
   await cache.del(audience);
   res.json({
