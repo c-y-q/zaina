@@ -9,7 +9,7 @@ const famlilySerive = require('../service/famliy');
 
 
 
-router.post("/news", async (req, res) => {
+router.post("/findUserInfo", async (req, res) => {
   const carToken = req.user.cartoken;
   const carUserId = req.user.carUserId;
   const phone = req.user.account;
