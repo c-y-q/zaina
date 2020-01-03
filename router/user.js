@@ -5,6 +5,7 @@
 const userService = require("../service/user");
 const petService = require('../service/petInfo');
 const eleccarService = require("../service/eleccar");
+const famlilySerive = require('../service/famliy');
 
 
 
@@ -12,28 +13,45 @@ router.post("/news", async (req, res) => {
   const carToken = req.user.cartoken;
   const carUserId = req.user.carUserId;
   const phone = req.user.account;
-
+  // const userId = '5cb945a0cce17f3e61ab69ea';
+      
   const pet = await petService.getPetInfo(phone);
-  log('犬只信息：', pet);
-
+  // 查询本用户金币
+  const money = await famlilySerive.findmoney(phone);
   const user = await userService.findUser(phone);
-  log('人员信息：', user);
-
+  user.money = money;
+  const family = await famlilySerive.queryStudentsList(phone);
   const carUserInfo = await eleccarService.getElecticCarUserInfo(carUserId, carToken);
-  log('carUserInfo', carUserInfo);
   if (!carUserInfo || carUserInfo.length == 0 || carUserInfo.usersOfSys.length == 0) {
       return [];
   }
   const carUserIdNum = carUserInfo.usersOfSys.map(obj => obj.account);
-  const eleccar = await eleccarService.getElecCarList(carUserIdNum[0], carToken);
-  log('车辆信息：', eleccar);
+  const eleccar = await eleccarService.getElecCarList(carUserIdNum, carToken);
 
   res.json({
     status: 200,
     pet,
     eleccar,
-    user
+    user,
+    family
   });
+})
+
+router.post('/sign', async (req,res) => {
+  const phone = req.user.account;
+  const result = await famlilySerive.sign(phone);
+
+      if (result) {
+        res.json({
+          status: 200,
+          msg: '签到成功'
+        })
+        return;
+      }
+        res.json({
+          status: 200,
+          msg: '今日已经签到'
+        })
 })
 
 /**
