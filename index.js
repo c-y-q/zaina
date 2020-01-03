@@ -69,7 +69,7 @@ app.use(async function (req, res, next) {
 routers(app);
 app.use(function (res, req, next) {
     if (res.path.indexOf('/favicon.ico') != -1) next();
-    let err = tools.throwError(404, 'Not Found !');
+    let err = tools.throwError(404, 'Not Found ');
     next(err);
 });
 app.use(function (err, req, res, next) {
