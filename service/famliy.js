@@ -68,6 +68,46 @@ exports.findChildrenByParentPhone = async (account) => {
     return classesInfos;
 }
 
+exports.findmoney = async (account) => {
+
+    const result = await mongoModel.famlilyUser.findOne({
+        account: account
+    },{
+        _id: 0,
+        'eMoney.money': 1
+    })
+    return result.eMoney.money;
+}
+
+exports.queryStudentsList = async (account) => {
+    const parentId = await getParentId(account);
+    if (!parentId) {
+        return [];
+    }
+    const classesParents = await mongoModel.famlilyClasses.aggregate([
+        {'$unwind': '$parents'},
+        {'$match': {'parents.parentId': parentId}},
+        {'$project': {'parents.studentId': 1, _id: 0}}
+    ])
+
+    const result = [];
+    for(let i = 0; i < classesParents.length; i++) {
+        const studentId = classesParents[i].parents.studentId;
+        const StudentInfo = await mongoModel.famlilyStudents.find({
+            _id: studentId
+        },{
+            __v: 0
+        })
+        result.push(StudentInfo[0])
+    }
+    
+    if (result.length == 0) {
+        return [];
+    }
+
+    return result;
+}
+
 /**
  * 获取作业列表
  */
@@ -223,6 +263,16 @@ exports.getGongGaoInformList = async (account, pageSize, pageIndex) => {
         resTempate.gongGaoList.push(gongGao);
     }
     return resTempate;
+}
+exports.sign = async (account) => {
+    const parentId = await getParentId(account);
+    if (!parentId) {
+        return [];
+    }
+    let todayDate = moment(new Date()).utcOffset(8).format('YYYY-MM-DD');
+    let addDate = moment(new Date()).utcOffset(8).add(1, 'days').format('YYYY-MM-DD');
+    const result = mongoModel.famlilyUser.findOneAndUpdate({_id: parentId, "eMoney.signedDate": {$lte : todayDate}}, {$inc:{"eMoney.money": 10}, "eMoney.signedDate": addDate});
+    return result;
 }
 /**
  * 家校惠通，根据手机号找到parentID;即userId
