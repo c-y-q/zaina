@@ -69,7 +69,15 @@ router.post("/login", async (req, res) => {
     })
     return;
   }
-
+  const key = `verify_code${account}`;
+  const sendSmsCode = await cache.get(key);
+  if (sendSmsCode != vcode) {
+    res.json({
+      status: 1001,
+      msg: '验证码错误'
+    })
+    return;
+  }
   await userService.findUser(account);
   const audience = tools.md5(account);
   const carInfo = await axios({
@@ -132,6 +140,7 @@ router.post('/sendSMS', async (req, res) => {
     })
     return;
   }
+  cache.set(key, sendSmsCode, 'EX', 60 * 3);
   res.json({
     status: 200,
     msg: '验证码发送成功,请注意查收'
