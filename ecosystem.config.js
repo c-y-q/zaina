@@ -8,7 +8,7 @@ module.exports = {
             "NODE_ENV": "dev"
         },
         env_prod: {
-            "PORT": 3070,
+            "PORT": 7003,
             "NODE_ENV": "prod",
         }
     }]

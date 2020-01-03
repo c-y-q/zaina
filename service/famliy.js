@@ -84,7 +84,6 @@ exports.getHomeworkInformList = async (account, pageSize, pageIndex) => {
         pageIndex,
         pageSize,
         homeworkList: []
-
     };
     const parentId = await getParentId(account);
     if (!parentId) {
@@ -99,7 +98,7 @@ exports.getHomeworkInformList = async (account, pageSize, pageIndex) => {
         return resTempate;
     }
     const classIdArr = classIds.map(obj => obj._id);
-    resTempate.totalCount = await mongoModel.famlilyHomework.count({
+    resTempate.totalCount = await mongoModel.famlilyHomework.countDocuments({
         classId: {
             $in: classIdArr
         }
@@ -114,12 +113,7 @@ exports.getHomeworkInformList = async (account, pageSize, pageIndex) => {
         }
     }).populate({
         path: "classId",
-        select: "name avatar grade school",
-        options: {
-            sort: {
-                createTime: -1
-            }
-        }
+        select: "name avatar grade school"
     }).populate({
         path: "creator",
         select: "name account nickName avatar"
@@ -187,7 +181,7 @@ exports.getGongGaoInformList = async (account, pageSize, pageIndex) => {
         return resTempate;
     }
     const classIdArr = classIds.map(obj => obj._id);
-    resTempate.totalCount = await mongoModel.famlilyBulletins.count({
+    resTempate.totalCount = await mongoModel.famlilyBulletins.countDocuments({
         classId: {
             $in: classIdArr
         }
@@ -202,12 +196,7 @@ exports.getGongGaoInformList = async (account, pageSize, pageIndex) => {
         }
     }).populate({
         path: "classId",
-        select: "name avatar grade school",
-        options: {
-            sort: {
-                createTime: -1
-            }
-        }
+        select: "name avatar grade school"
     }).populate({
         path: "creator",
         select: "name account nickName avatar"
