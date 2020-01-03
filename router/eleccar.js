@@ -10,15 +10,9 @@ const eleccarService = require("../service/eleccar");
 router.post("/getElecCarList", async (req, res) => {
   const carToken = req.user.cartoken;
   const carUserId = "5cb945a0cce17f3e61ab69ea"; //req.user.carUserId;
-  const carUserInfo = await eleccarService.getElecticCarUserInfo(
-    carUserId,
-    carToken
-  );
-  if (
-    !carUserInfo ||
-    carUserInfo.length == 0 ||
-    carUserInfo.usersOfSys.length == 0
-  ) {
+
+  const carUserInfo = await eleccarService.getElecticCarUserInfo(carUserId, carToken);
+  if (!carUserInfo || carUserInfo.length == 0 || carUserInfo.usersOfSys.length == 0) {
     res.json({
       status: 200,
       result: []
@@ -66,6 +60,7 @@ router.post("/getPeopleGuiJi", async (req, res) => {
     status: 200,
     result
   });
+
   res.body = result;
 });
 
@@ -87,18 +82,10 @@ router.post("/getElectCarGuiJi", async (req, res) => {
     });
     return;
   }
-  const startDate =
-    req.body.startDate ||
-    moment()
-      .subtract(2, "days")
-      .format("YYYY/MM/DD HH:mm:ss");
+
+  const startDate = req.body.startDate || moment().subtract(2, "days").format("YYYY/MM/DD HH:mm:ss");
   const endDate = req.body.endDate || moment().format("YYYY/MM/DD HH:mm:ss");
-  const result = await eleccarService.getElectCarGuiJi(
-    encodeURIComponent(chePaiCode),
-    startDate,
-    endDate,
-    carToken
-  );
+  const result = await eleccarService.getElectCarGuiJi(encodeURIComponent(chePaiCode), encodeURIComponent(startDate), encodeURIComponent(endDate), carToken);
   res.json({
     status: 200,
     result
@@ -113,16 +100,9 @@ router.post("/lockElectricCar", async (req, res) => {
   const carUserId = req.user.carUserId;
   const eviId = req.body.eviId;
   const lockState = req.body.lockState && req.body.lockState == "lock" ? 0 : 1;
-  const carUserInfo = await eleccarService.getElecticCarUserInfo(
-    carUserId,
-    carToken
-  );
-  if (
-    !carUserInfo ||
-    carUserInfo.length == 0 ||
-    carUserInfo.usersOfSys.length == 0 ||
-    !eviId
-  ) {
+
+  const carUserInfo = await eleccarService.getElecticCarUserInfo(carUserId, carToken);
+  if (!carUserInfo || carUserInfo.length == 0 || carUserInfo.usersOfSys.length == 0 || !eviId) {
     res.json({
       status: 200,
       msg: "无电车信息"
@@ -138,12 +118,8 @@ router.post("/lockElectricCar", async (req, res) => {
     });
     return;
   }
-  const result = await eleccarService.lockElectricCar(
-    carToken,
-    carUserId,
-    eviId,
-    lockState
-  );
+
+  const result = await eleccarService.lockElectricCar(carToken, carUserId, eviId, lockState);
   res.json({
     status: 200,
     result
