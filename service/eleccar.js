@@ -3,7 +3,7 @@
  */
 exports.getElecCarList = async (idNum, carToken) => {
   const result = await axios({
-    method: "post",
+    method: "POST",
     url: `https://api.hbzner.com/v1/vehicles`,
     headers: {
       authorization: carToken
@@ -13,12 +13,27 @@ exports.getElecCarList = async (idNum, carToken) => {
   return (result && result.data) || "";
 };
 
+exports.getElecCarnumber = async (idNum, carToken) => {
+  const result = await axios({
+    method: "POST",
+    url: `https://api.hbzner.com/v1/vehicles`,
+    headers: {
+      authorization: carToken
+    },
+    data: idNum
+  });
+  if (result.data.length == 0) {
+    return '暂无车辆';
+  }
+  return (result && result.data[0].code) || "暂无车辆";
+};
+
 /**
  * 获取用户信息
  */
 exports.getElecticCarUserInfo = async (carUserId, carToken) => {
   const result = await axios({
-    method: "get",
+    method: "GET",
     url: `https://api.hbzner.com/v1/users/${carUserId}`,
     headers: {
       authorization: carToken
