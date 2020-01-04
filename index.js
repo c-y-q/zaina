@@ -88,11 +88,11 @@ app.use(function (err, req, res, next) {
     }
     process.env.NODE_ENV == 'dev' ? errMsg.error = err.stack : errMsg.error = err.message;
     res.json(errMsg);
-    console.error(83, errMsg);
+    log(83, errMsg);
 });
 const server = http.createServer(app);
 server.listen(process.env.PORT || config.port);
 server.on("listening", function () {
     const addr = server.address();
-    console.log(`app listen on port ${addr.port}.......+++++ 当前运行的环境是：${process.env.NODE_ENV}`);
+    log(`app listen on port ${addr.port}....... 当前运行的环境是：${process.env.NODE_ENV}`);
 });
