@@ -7,14 +7,12 @@ const petService = require('../service/petInfo');
 const eleccarService = require("../service/eleccar");
 const famlilySerive = require('../service/famliy');
 
-
-
 router.post("/findUserInfo", async (req, res) => {
   const carToken = req.user.cartoken;
   // const carUserId = req.user.carUserId;
   const phone = req.user.account;
-   const userId = '5cb945a0cce17f3e61ab69ea';
-      
+  const userId = '5cb945a0cce17f3e61ab69ea';
+
   const pet = await petService.getPetInfo(phone);
   // 查询本用户金币
   const money = await famlilySerive.findmoney(phone);
@@ -23,7 +21,7 @@ router.post("/findUserInfo", async (req, res) => {
   const family = await famlilySerive.queryStudentsList(phone);
   const carUserInfo = await eleccarService.getElecticCarUserInfo(userId, carToken);
   if (!carUserInfo || carUserInfo.length == 0 || carUserInfo.usersOfSys.length == 0) {
-      return [];
+    return [];
   }
   const carUserIdNum = carUserInfo.usersOfSys.map(obj => obj.account);
   const eleccar = await eleccarService.getElecCarList(carUserIdNum, carToken);
@@ -36,24 +34,24 @@ router.post("/findUserInfo", async (req, res) => {
     student: family,
     keeper: []
   });
-});
+})
 
-router.post("/sign", async (req, res) => {
+router.post('/sign', async (req, res) => {
   const phone = req.user.account;
   const result = await famlilySerive.sign(phone);
 
   if (result) {
     res.json({
       status: 200,
-      msg: "签到成功"
-    });
+      msg: '签到成功'
+    })
     return;
   }
   res.json({
     status: 200,
-    msg: "今日已经签到"
-  });
-});
+    msg: '今日已经签到'
+  })
+})
 
 /**
  * 登录
@@ -111,42 +109,43 @@ router.post("/login", async (req, res) => {
 /**
  * 发送手机验证码
  */
-router.post("/sendSMS", async (req, res) => {
+router.post('/sendSMS', async (req, res) => {
   const account = req.body.account;
   if (!validate.phone(account)) {
     res.json({
       status: 401,
       msg: " 手机格式错误"
-    });
+    })
     return;
   }
   const sendSMsRes = await axios({
-    method: "get",
+    method: 'get',
     url: `https://api.hbzner.com/v1/verificationCode/${account}`
-  });
+  })
   if (sendSMsRes && sendSMsRes.data && sendSMsRes.data.times == 3) {
     res.json({
       status: 405,
       msg: " 验证码发送次数已达到最大限制"
-    });
+    })
     return;
   }
   res.json({
     status: 200,
-    msg: "验证码发送成功,请注意查收"
-  });
-});
+    msg: '验证码发送成功,请注意查收'
+  })
+
+})
 
 /**
  * 退出登录
  */
-router.post("/logout", async (req, res) => {
+router.post('/logout', async (req, res) => {
   const audience = req.user.audience;
   await cache.del(audience);
   res.json({
     status: 200,
-    msg: "已退出登录！"
-  });
-});
+    msg: '已退出登录！'
+  })
+})
 
 module.exports = router;
