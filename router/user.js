@@ -31,11 +31,13 @@ router.post("/findUserInfo", async (req, res) => {
 
   res.json({
     status: 200,
-    pet,
-    eleccar,
-    user,
-    student: family,
-    keeper: '暂无信息'
+    result: {
+      pet,
+      eleccar,
+      user,
+      student: family,
+      keeper: '暂无信息'
+    }
   });
 })
 

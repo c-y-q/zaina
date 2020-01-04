@@ -31,7 +31,7 @@ exports.getPetInfo = async (phone) => {
 exports.getPetNum = async (phone) => {
   const db = await mysqlUtil();
   const sql = ` SELECT
-  if(p.dog_reg_num= '','暂无犬只',p.dog_reg_num) as dog_reg_num
+  p.dog_reg_num as dog_reg_num
 FROM
   pet_master m,
   pet_register_info p,
@@ -43,7 +43,7 @@ WHERE
   AND m.contact_phone = ? `;
   const result = await db.query(sql, [phone]);
   db.close();
-  return tools.toTuoFeng(result[0]);
+  return tools.toTuoFeng(result[0] && result[0].dog_reg_num || '暂无犬只');
 };
 
 exports.isPetMaster = async (phone) => {
