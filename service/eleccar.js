@@ -13,6 +13,18 @@ exports.getElecCarList = async (idNum, carToken) => {
   return (result && result.data) || "";
 };
 
+exports.getElecCarnumber = async (idNum, carToken) => {
+  const result = await axios({
+    method: "POST",
+    url: `https://api.hbzner.com/v1/vehicles`,
+    headers: {
+      authorization: carToken
+    },
+    data: idNum
+  });
+  return (result && result.data[0].code) || "暂无车辆";
+};
+
 /**
  * 获取用户信息
  */

@@ -24,16 +24,27 @@ exports.getPetInfo = async (phone) => {
     AND p.pet_state IN ( 1, 3 ) 
     AND m.contact_phone = ? `;
     const result = await db.query(sql, [phone]);
-    for (let i = 0; i < result.length; i ++) {
-      result[i].id_number = result[i].id_number.replace(
-        /^(.{6})(?:\d+)(.{4})$/,
-        "$1********$2"
-      );
-      result[i].contact_phone = result[i].contact_phone.replace(/(\d{3})\d{4}(\d{4})/, "$1****$2");
-    }
     db.close();
     return tools.toTuoFeng(result);
-}
+};
+
+exports.getPetNum = async (phone) => {
+  const db = await mysqlUtil();
+  const sql = ` SELECT
+  if(p.dog_reg_num= '','暂无犬只',p.dog_reg_num) as dog_reg_num
+FROM
+  pet_master m,
+  pet_register_info p,
+  sys_branch s 
+WHERE
+  p.area_code = s.CODE 
+  AND m.id = p.master_id 
+  AND p.pet_state IN ( 1, 3 ) 
+  AND m.contact_phone = ? `;
+  const result = await db.query(sql, [phone]);
+  db.close();
+  return tools.toTuoFeng(result[0]);
+};
 
 exports.isPetMaster = async (phone) => {
   const db = await mysqlUtil();

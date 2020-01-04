@@ -11,11 +11,14 @@ const famlilySerive = require('../service/famliy');
 
 router.post("/findUserInfo", async (req, res) => {
   const carToken = req.user.cartoken;
+
   // const carUserId = req.user.carUserId;
   const phone = req.user.account;
+
    const userId = '5cb945a0cce17f3e61ab69ea';
       
-  const pet = await petService.getPetInfo(phone);
+  const pet = await petService.getPetNum(phone);
+
   // 查询本用户金币
   const money = await famlilySerive.findmoney(phone);
   const user = await userService.findUser(phone);
@@ -26,7 +29,7 @@ router.post("/findUserInfo", async (req, res) => {
       return [];
   }
   const carUserIdNum = carUserInfo.usersOfSys.map(obj => obj.account);
-  const eleccar = await eleccarService.getElecCarList(carUserIdNum, carToken);
+  const eleccar = await eleccarService.getElecCarnumber(carUserIdNum, carToken);
 
   res.json({
     status: 200,
@@ -34,7 +37,7 @@ router.post("/findUserInfo", async (req, res) => {
     eleccar,
     user,
     student: family,
-    keeper: []
+    keeper: '暂无信息'
   });
 })
 

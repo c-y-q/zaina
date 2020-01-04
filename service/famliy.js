@@ -105,7 +105,7 @@ exports.queryStudentsList = async (account) => {
         return [];
     }
 
-    return result;
+    return result[0].name || '暂无信息';
 }
 
 /**
