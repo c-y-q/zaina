@@ -24,6 +24,13 @@ exports.getPetInfo = async (phone) => {
     AND p.pet_state IN ( 1, 3 ) 
     AND m.contact_phone = ? `;
     const result = await db.query(sql, [phone]);
+    for (let i = 0; i < result.length; i ++) {
+      result[i].id_number = result[i].id_number.replace(
+        /^(.{6})(?:\d+)(.{4})$/,
+        "$1********$2"
+      );
+      result[i].contact_phone = result[i].contact_phone.replace(/(\d{3})\d{4}(\d{4})/, "$1****$2");
+    }
     db.close();
     return tools.toTuoFeng(result);
 }
