@@ -110,4 +110,32 @@ router.post("/lockElectricCar", async (req, res) => {
   });
 });
 
+/**
+ * 电车卫士消息列表
+ */
+router.post('/getEeticCarNoticeList', async (req, res) => {
+  const mobile = '17831001423' || req.user.account;
+  const carToken = req.user.cartoken;
+  const page = parseInt(req.body.page) || 1;
+  const noticeList = await eleccarService.getEeticCarNoticeList(mobile, page, carToken);
+  const regChepai = /^[A-Z]{2}\d{6,}/;
+  const regTime = /\d{4}\-\d{2}\-\d{2}\s\d{2}\:\d{2}\:\d{2}/;
+  const result = [];
+  if (noticeList.length > 0) {
+    for (let rs of noticeList) {
+      let content = rs.content;
+      let notice = {
+        title: rs.title || '',
+        chePai: content.match(regChepai) && content.match(regChepai)[0] || '',
+        noticeTime: content.match(regTime) && content.match(regTime)[0] || '',
+        noticeAddr: content.substring(content.lastIndexOf(':') + 1) || '',
+      }
+      result.push(notice);
+    }
+  }
+  res.json({
+    status: 200,
+    result
+  })
+})
 module.exports = router;
