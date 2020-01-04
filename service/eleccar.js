@@ -22,6 +22,9 @@ exports.getElecCarnumber = async (idNum, carToken) => {
     },
     data: idNum
   });
+  if (result.data.length == 0) {
+    return '暂无车辆';
+  }
   return (result && result.data[0].code) || "暂无车辆";
 };
 

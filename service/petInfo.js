@@ -42,6 +42,9 @@ WHERE
   AND p.pet_state IN ( 1, 3 ) 
   AND m.contact_phone = ? `;
   const result = await db.query(sql, [phone]);
+  if (result.length == 0) {
+    return '暂无犬只';
+  }
   db.close();
   return tools.toTuoFeng(result[0] && result[0].dog_reg_num || '暂无犬只');
 };
