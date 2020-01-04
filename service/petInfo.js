@@ -4,6 +4,8 @@ exports.getPetInfo = async (phone) => {
     REPLACE ( p.pet_photo_url, '${config.pet.replaceImgPath}', '${config.pet.imgHttp}' ) pet_photo_url,
     p.pet_name,
     p.gender,
+    p.pet_state,
+    p.expire_time,
     p.birthday,
     p.area_code,
     p.breed,
@@ -13,7 +15,8 @@ exports.getPetInfo = async (phone) => {
     m.id_number,
     m.real_name,
     m.residential_address,
-    m.contact_phone 
+    m.contact_phone,
+    s.name area_name
   FROM
     pet_master m,
     pet_register_info p,
