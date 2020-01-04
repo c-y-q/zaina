@@ -33,7 +33,8 @@ router.post("/findUserInfo", async (req, res) => {
     pet,
     eleccar,
     user,
-    family
+    student: family,
+    keeper: []
   });
 })
 
