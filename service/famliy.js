@@ -74,9 +74,10 @@ exports.findmoney = async (account) => {
         account: account
     },{
         _id: 0,
-        'eMoney.money': 1
+        'eMoney.money': 1,
+        'eMoney.signedDate': 1
     })
-    return result.eMoney.money;
+    return result.eMoney;
 }
 
 exports.queryStudentsList = async (account) => {
@@ -89,23 +90,24 @@ exports.queryStudentsList = async (account) => {
         {'$match': {'parents.parentId': parentId}},
         {'$project': {'parents.studentId': 1, _id: 0}}
     ])
-
     const result = [];
     for(let i = 0; i < classesParents.length; i++) {
         const studentId = classesParents[i].parents.studentId;
+
         const StudentInfo = await mongoModel.famlilyStudents.find({
             _id: studentId
         },{
             __v: 0
         })
+
         result.push(StudentInfo[0])
     }
-    
+
     if (result.length == 0) {
-        return [];
+        return '暂无信息';
     }
 
-    return result;
+    return result[0] && result[0].name || '暂无信息';
 }
 
 /**

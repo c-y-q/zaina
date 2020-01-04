@@ -11,28 +11,41 @@ router.post("/findUserInfo", async (req, res) => {
   const carToken = req.user.cartoken;
   // const carUserId = req.user.carUserId;
   const phone = req.user.account;
-  const userId = '5cb945a0cce17f3e61ab69ea';
 
-  const pet = await petService.getPetInfo(phone);
+   const userId = '5cb945a0cce17f3e61ab69ea';
+      
+  const pet = await petService.getPetNum(phone);
+
   // 查询本用户金币
-  const money = await famlilySerive.findmoney(phone);
+  const signmoney = await famlilySerive.findmoney(phone);
   const user = await userService.findUser(phone);
-  user.money = money;
+  user.money = signmoney.money;
+
+  // 判断今日是否可以签到
+  let panduan = true;
+  let todayDate = moment(new Date()).utcOffset(8).format('YYYY-MM-DD');
+  if (todayDate < signmoney.signedDate) {
+    panduan = false;
+  }
+
   const family = await famlilySerive.queryStudentsList(phone);
   const carUserInfo = await eleccarService.getElecticCarUserInfo(userId, carToken);
   if (!carUserInfo || carUserInfo.length == 0 || carUserInfo.usersOfSys.length == 0) {
     return [];
   }
   const carUserIdNum = carUserInfo.usersOfSys.map(obj => obj.account);
-  const eleccar = await eleccarService.getElecCarList(carUserIdNum, carToken);
+  const eleccar = await eleccarService.getElecCarnumber(carUserIdNum, carToken);
 
   res.json({
     status: 200,
-    pet,
-    eleccar,
-    user,
-    student: family,
-    keeper: []
+    result: {
+      pet,
+      eleccar,
+      user,
+      student: family,
+      keeper: '暂无信息',
+      signed: panduan
+    }
   });
 })
 
@@ -48,7 +61,7 @@ router.post('/sign', async (req, res) => {
     return;
   }
   res.json({
-    status: 200,
+    status: 201,
     msg: '今日已经签到'
   })
 })

@@ -4,6 +4,8 @@ exports.getPetInfo = async (phone) => {
     REPLACE ( p.pet_photo_url, '${config.pet.replaceImgPath}', '${config.pet.imgHttp}' ) pet_photo_url,
     p.pet_name,
     p.gender,
+    p.pet_state,
+    p.expire_time,
     p.birthday,
     p.area_code,
     p.breed,
@@ -13,7 +15,8 @@ exports.getPetInfo = async (phone) => {
     m.id_number,
     m.real_name,
     m.residential_address,
-    m.contact_phone 
+    m.contact_phone,
+    s.name area_name
   FROM
     pet_master m,
     pet_register_info p,
@@ -24,16 +27,33 @@ exports.getPetInfo = async (phone) => {
     AND p.pet_state IN ( 1, 3 ) 
     AND m.contact_phone = ? `;
     const result = await db.query(sql, [phone]);
-    for (let i = 0; i < result.length; i ++) {
-      result[i].id_number = result[i].id_number.replace(
-        /^(.{6})(?:\d+)(.{4})$/,
-        "$1********$2"
-      );
-      result[i].contact_phone = result[i].contact_phone.replace(/(\d{3})\d{4}(\d{4})/, "$1****$2");
+    for (let i = 0; i < result.length; i++) {
+      result[i].expire_time = moment(result[i].expire_time.substr(0,7)).format('YYYY-MM-DD');
     }
     db.close();
     return tools.toTuoFeng(result);
-}
+};
+
+exports.getPetNum = async (phone) => {
+  const db = await mysqlUtil();
+  const sql = ` SELECT
+  p.dog_reg_num as dog_reg_num
+FROM
+  pet_master m,
+  pet_register_info p,
+  sys_branch s 
+WHERE
+  p.area_code = s.CODE 
+  AND m.id = p.master_id 
+  AND p.pet_state IN ( 1, 3 ) 
+  AND m.contact_phone = ? `;
+  const result = await db.query(sql, [phone]);
+  if (result.length == 0) {
+    return '暂无犬只';
+  }
+  db.close();
+  return tools.toTuoFeng(result[0] && result[0].dog_reg_num || '暂无犬只');
+};
 
 exports.isPetMaster = async (phone) => {
   const db = await mysqlUtil();
