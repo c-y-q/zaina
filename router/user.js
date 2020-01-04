@@ -11,9 +11,9 @@ const famlilySerive = require('../service/famliy');
 
 router.post("/findUserInfo", async (req, res) => {
   const carToken = req.user.cartoken;
-  const carUserId = req.user.carUserId;
+  // const carUserId = req.user.carUserId;
   const phone = req.user.account;
-  // const userId = '5cb945a0cce17f3e61ab69ea';
+   const userId = '5cb945a0cce17f3e61ab69ea';
       
   const pet = await petService.getPetInfo(phone);
   // 查询本用户金币
@@ -21,7 +21,7 @@ router.post("/findUserInfo", async (req, res) => {
   const user = await userService.findUser(phone);
   user.money = money;
   const family = await famlilySerive.queryStudentsList(phone);
-  const carUserInfo = await eleccarService.getElecticCarUserInfo(carUserId, carToken);
+  const carUserInfo = await eleccarService.getElecticCarUserInfo(userId, carToken);
   if (!carUserInfo || carUserInfo.length == 0 || carUserInfo.usersOfSys.length == 0) {
       return [];
   }
@@ -69,7 +69,15 @@ router.post("/login", async (req, res) => {
     })
     return;
   }
-
+  const key = `verify_code${account}`;
+  const sendSmsCode = await cache.get(key);
+  if (sendSmsCode != vcode) {
+    res.json({
+      status: 1001,
+      msg: '验证码错误'
+    })
+    return;
+  }
   await userService.findUser(account);
   const audience = tools.md5(account);
   const carInfo = await axios({
@@ -132,6 +140,7 @@ router.post('/sendSMS', async (req, res) => {
     })
     return;
   }
+  cache.set(key, sendSmsCode, 'EX', 60 * 3);
   res.json({
     status: 200,
     msg: '验证码发送成功,请注意查收'

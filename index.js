@@ -19,6 +19,8 @@ app.all("*", function (req, res, next) {
     );
     if (req.method.toLowerCase() == "options") res.send(200);
     else next();
+    // if (req.method.toLowerCase() == "options") res.send(200);
+    // else 
 });
 app.use(express.json()).use(
     express.urlencoded({
@@ -64,8 +66,8 @@ app.use(async function (req, res, next) {
             log(52, tokenObj)
             const userName = tokenObj && tokenObj.audience || '';
             const redisUserInfo = await cache.get(userName);
-            const userStr = redisUserInfo && JSON.parse(redisUserInfo);
-            if (!redisUserInfo || !(tokenObj.visitIP == userStr.visitIP && userStr.visitIP == req.ip && tokenObj.audience == userStr.audience && tokenObj.uuid == userStr.uuid)) {
+            const userStr = redisUserInfo && JSON.parse(redisUserInfo); //tokenObj.visitIP == userStr.visitIP && userStr.visitIP == req.ip && 
+            if (!redisUserInfo || !(tokenObj.audience == userStr.audience && tokenObj.uuid == userStr.uuid)) {
                 let err = tools.throwError(403, 'token is wrong !');
                 next(err);
             } else {
