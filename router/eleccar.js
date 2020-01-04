@@ -126,9 +126,9 @@ router.post('/getEeticCarNoticeList', async (req, res) => {
       let content = rs.content;
       let notice = {
         title: rs.title || '',
-        chePai: content.match(regChepai) && content.match(regChepai)[0] || '',
-        noticeTime: content.match(regTime) && content.match(regTime)[0] || '',
-        noticeAddr: content.substring(content.lastIndexOf(':') + 1) || '',
+        chePai: content.match(regChepai) && content.match(regChepai)[0] || content,
+        noticeTime: content.match(regTime) && content.match(regTime)[0] || content,
+        noticeAddr: content.substring(content.lastIndexOf(':') + 1) || content,
       }
       result.push(notice);
     }
