@@ -74,9 +74,10 @@ exports.findmoney = async (account) => {
         account: account
     },{
         _id: 0,
-        'eMoney.money': 1
+        'eMoney.money': 1,
+        'eMoney.signedDate': 1
     })
-    return result.eMoney.money;
+    return result.eMoney;
 }
 
 exports.queryStudentsList = async (account) => {

@@ -18,9 +18,17 @@ router.post("/findUserInfo", async (req, res) => {
   const pet = await petService.getPetNum(phone);
 
   // 查询本用户金币
-  const money = await famlilySerive.findmoney(phone);
+  const signmoney = await famlilySerive.findmoney(phone);
   const user = await userService.findUser(phone);
-  user.money = money;
+  user.money = signmoney.money;
+
+  // 判断今日是否可以签到
+  let panduan = true;
+  let todayDate = moment(new Date()).utcOffset(8).format('YYYY-MM-DD');
+  if (todayDate < signmoney.signedDate) {
+    panduan = false;
+  }
+
   const family = await famlilySerive.queryStudentsList(phone);
   const carUserInfo = await eleccarService.getElecticCarUserInfo(userId, carToken);
   if (!carUserInfo || carUserInfo.length == 0 || carUserInfo.usersOfSys.length == 0) {
@@ -36,7 +44,8 @@ router.post("/findUserInfo", async (req, res) => {
       eleccar,
       user,
       student: family,
-      keeper: '暂无信息'
+      keeper: '暂无信息',
+      signed: panduan
     }
   });
 })
