@@ -3,7 +3,7 @@
  */
 exports.getElecCarList = async (idNum, carToken) => {
   const result = await axios({
-    method: "POST",
+    method: "post",
     url: `https://api.hbzner.com/v1/vehicles`,
     headers: {
       authorization: carToken
@@ -30,7 +30,7 @@ exports.getElecCarnumber = async (idNum, carToken) => {
  */
 exports.getElecticCarUserInfo = async (carUserId, carToken) => {
   const result = await axios({
-    method: "GET",
+    method: "get",
     url: `https://api.hbzner.com/v1/users/${carUserId}`,
     headers: {
       authorization: carToken
@@ -95,3 +95,18 @@ exports.lockElectricCar = async (carToken, userId, eviId, lockState) => {
   });
   return (result && result.data) || "";
 };
+
+/**
+ * 电车卫士消息列表
+ */
+exports.getEeticCarNoticeList = async (mobile, page, carToken) => {
+  const url = `https://api.hbzner.com/v1/notices/${mobile}/pages/${page}`;
+  const result = await axios({
+    method: "get",
+    url: url,
+    headers: {
+      authorization: carToken
+    }
+  });
+  return result.data || [];
+}
