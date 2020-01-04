@@ -62,7 +62,7 @@ router.post('/sign', async (req, res) => {
     return;
   }
   res.json({
-    status: 200,
+    status: 201,
     msg: '今日已经签到'
   })
 })

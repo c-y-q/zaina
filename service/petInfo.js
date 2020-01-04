@@ -27,6 +27,9 @@ exports.getPetInfo = async (phone) => {
     AND p.pet_state IN ( 1, 3 ) 
     AND m.contact_phone = ? `;
     const result = await db.query(sql, [phone]);
+    for (let i = 0; i < result.length; i++) {
+      result[i].expire_time = moment(result[i].expire_time.substr(0,7)).format('YYYY-MM-DD');
+    }
     db.close();
     return tools.toTuoFeng(result);
 };
