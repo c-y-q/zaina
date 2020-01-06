@@ -132,11 +132,24 @@ router.post('/getEeticCarNoticeList', async (req, res) => {
 /**
  * 获取最后一个点位
  */
-router.post('/getLastPoint', async (req, res) => {
-  const result = await eleccarService.getLastPoint(params);
+router.post('/getEleticCarLastPoint', async (req, res) => {
+  const carToken = req.user.cartoken;
+  const chePaiCode = req.body.code;
+  if (!chePaiCode) {
+    res.json({
+      status: 200,
+      result: {
+        Result: 200,
+        Description: "成功",
+        Data: []
+      }
+    });
+    return;
+  }
+  const result = await eleccarService.getEleticCarLastPoint(carToken, chePaiCode);
   res.json({
     status: 200,
-
+    result: result
   })
 })
 module.exports = router;

@@ -114,3 +114,15 @@ exports.getEeticCarNoticeList = async (mobile, page, carToken) => {
   });
   return result.data || [];
 }
+
+exports.getEleticCarLastPoint = async (carToken, chePaiCode) => {
+  const url = `https://app.hbzner.com/api/Gis/GetLastTrack?code=${encodeURIComponent(chePaiCode)}`;
+  const result = await axios({
+    method: "get",
+    url: url,
+    headers: {
+      authorization: carToken
+    }
+  });
+  return result.data;
+}
