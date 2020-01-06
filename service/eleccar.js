@@ -96,7 +96,7 @@ exports.lockElectricCar = async (carToken, userId, eviId, lockState) => {
       }
     }
   });
-  return (result && result.data) || "";
+  return result && result.data;
 };
 
 /**

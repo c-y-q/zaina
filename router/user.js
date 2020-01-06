@@ -11,23 +11,18 @@ router.post("/findUserInfo", async (req, res) => {
   const carToken = req.user.cartoken;
   // const carUserId = req.user.carUserId;
   const phone = req.user.account;
-
-   const userId = '5cb945a0cce17f3e61ab69ea';
-      
+  const userId = '5cb945a0cce17f3e61ab69ea';
   const pet = await petService.getPetNum(phone);
-
   // 查询本用户金币
   const signmoney = await famlilySerive.findmoney(phone);
   const user = await userService.findUser(phone);
   user.money = signmoney.money;
-
   // 判断今日是否可以签到
   let panduan = true;
   let todayDate = moment(new Date()).utcOffset(8).format('YYYY-MM-DD');
   if (todayDate < signmoney.signedDate) {
     panduan = false;
   }
-
   const family = await famlilySerive.queryStudentsList(phone);
   const carUserInfo = await eleccarService.getElecticCarUserInfo(userId, carToken);
   if (!carUserInfo || carUserInfo.length == 0 || carUserInfo.usersOfSys.length == 0) {
@@ -35,7 +30,6 @@ router.post("/findUserInfo", async (req, res) => {
   }
   const carUserIdNum = carUserInfo.usersOfSys.map(obj => obj.account);
   const eleccar = await eleccarService.getElecCarnumber(carUserIdNum, carToken);
-
   res.json({
     status: 200,
     result: {
@@ -52,7 +46,6 @@ router.post("/findUserInfo", async (req, res) => {
 router.post('/sign', async (req, res) => {
   const phone = req.user.account;
   const result = await famlilySerive.sign(phone);
-
   if (result) {
     res.json({
       status: 200,
