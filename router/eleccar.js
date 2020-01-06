@@ -83,8 +83,8 @@ router.post("/getElectCarGuiJi", async (req, res) => {
  */
 router.post("/lockElectricCar", async (req, res) => {
   const carToken = req.user.cartoken;
-  const carUserId = "5cb945a0cce17f3e6" || req.user.carUserId;
   const elecCarUserId = req.body.elecCarUserId;
+  const eviId = req.body.eviId;
   if (!elecCarUserId) {
     res.json({
       status: 1001,
@@ -92,29 +92,11 @@ router.post("/lockElectricCar", async (req, res) => {
     });
     return;
   }
-  const eviId = req.body.eviId;
   const lockState = req.body.lockState && req.body.lockState == "lock" ? 0 : 1;
-  const carUserInfo = await eleccarService.getElecticCarUserInfo(carUserId, carToken);
-  if (!carUserInfo || carUserInfo.length == 0 || carUserInfo.usersOfSys.length == 0 || !eviId) {
-    res.json({
-      status: 200,
-      msg: "无电车信息"
-    });
-    return;
-  }
-  const carUserIdNum = carUserInfo.usersOfSys.map(obj => obj.account);
-  const carInfo = await eleccarService.getElecCarList(carUserIdNum, carToken);
-  if (carInfo.length == 0) {
-    res.json({
-      status: 200,
-      msg: "无电车信息"
-    });
-    return;
-  }
   const result = await eleccarService.lockElectricCar(carToken, elecCarUserId, eviId, lockState);
   res.json({
     status: 200,
-    result
+    result: result
   });
 });
 
@@ -144,6 +126,17 @@ router.post('/getEeticCarNoticeList', async (req, res) => {
   res.json({
     status: 200,
     result
+  })
+})
+
+/**
+ * 获取最后一个点位
+ */
+router.post('/getLastPoint', async (req, res) => {
+  const result = await eleccarService.getLastPoint(params);
+  res.json({
+    status: 200,
+
   })
 })
 module.exports = router;

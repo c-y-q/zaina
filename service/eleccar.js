@@ -33,12 +33,13 @@ exports.getElecCarnumber = async (idNum, carToken) => {
  */
 exports.getElecticCarUserInfo = async (carUserId, carToken) => {
   const result = await axios({
-    method: "GET",
+    method: "get",
     url: `https://api.hbzner.com/v1/users/${carUserId}`,
     headers: {
       authorization: carToken
     }
   });
+  log(42, result)
   return result && result.data;
 };
 
@@ -82,21 +83,21 @@ exports.getElectCarGuiJi = async (code, startDate, endDate, carToken) => {
  */
 exports.lockElectricCar = async (carToken, userId, eviId, lockState) => {
   const result = await axios({
-    method: "post",
-    url: `https://app.hbzner.com/api/Vehicle/Lock`,
+    method: "POST",
+    url: "https://app.hbzner.com/api/Vehicle/Lock",
     headers: {
       authorization: carToken
     },
     data: {
-      UserID: userId,
-      Key: "",
-      Data: {
-        ID: eviId,
-        Lock: lockState
+      key: null,
+      "UserId": `${userId}`,
+      "Data": {
+        "ID": `${eviId}`,
+        "Lock": lockState
       }
     }
   });
-  return result && result.data;
+  return result.data;
 };
 
 /**
