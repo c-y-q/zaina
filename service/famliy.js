@@ -2,8 +2,7 @@
  * 根据家长手机号查询小孩数据
  */
 exports.findChildrenByParentPhone = async (account) => {
-    const mobile = account;
-    const parentId = await getParentId(mobile);
+    const parentId = await getParentId(account);
     if (!parentId) {
         return [];
     }

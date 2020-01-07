@@ -5,8 +5,8 @@ const eleccarService = require("../service/eleccar");
  * todo:孩子考勤，进门出门时间
  */
 router.post('/findChildrenByParentPhone', async (req, res) => {
-    let phone = req.user.account;
-    const result = await famlilySerive.findChildrenByParentPhone(phone);
+    const account = req.user.account;
+    const result = await famlilySerive.findChildrenByParentPhone(account);
     res.json({
         status: 200,
         result
