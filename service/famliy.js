@@ -2,7 +2,8 @@
  * 根据家长手机号查询小孩数据
  */
 exports.findChildrenByParentPhone = async (account) => {
-    const parentId = await getParentId(account);
+    const mobile = account;
+    const parentId = await getParentId(mobile);
     if (!parentId) {
         return [];
     }
@@ -32,12 +33,12 @@ exports.findChildrenByParentPhone = async (account) => {
     /**
      * 有学生，查询得分情况
      */
-    const classesInfos = JSON.parse(JSON.stringify(classesParents).replace(/(studentId)/g, 'student'));
-    for (const i = 0; i < classesInfos.length; i++) {
-        const parents = classesInfos[i].parents;
-        for (const p = 0; p < parents.length; p++) {
-            const studentId = parents[p].student._id;
-            const score = await mongoModel.famlilyScore.find({
+    let classesInfos = JSON.parse(JSON.stringify(classesParents).replace(/(studentId)/g, 'student'));
+    for (let i = 0; i < classesInfos.length; i++) {
+        let parents = classesInfos[i].parents;
+        for (let p = 0; p < parents.length; p++) {
+            let studentId = parents[p].student._id;
+            let score = await mongoModel.famlilyScore.find({
                 classesId: classesInfos[i]._id,
                 studentId: studentId
             }, {
@@ -48,12 +49,12 @@ exports.findChildrenByParentPhone = async (account) => {
             /**
              * 为得分的行为分组，积极的，
              */
-            const jieji = [],
+            let jiji = [],
                 xiaoji = [];
             if (score.length > 0) {
-                for (const sc of score) {
+                for (let sc of score) {
                     if (sc.behavior.type == '积极的') {
-                        jieji.push(sc)
+                        jiji.push(sc)
                     } else {
                         xiaoji.push(sc)
                     }
@@ -72,7 +73,7 @@ exports.findmoney = async (account) => {
 
     const result = await mongoModel.famlilyUser.findOne({
         account: account
-    },{
+    }, {
         _id: 0,
         'eMoney.money': 1,
         'eMoney.signedDate': 1
@@ -85,18 +86,28 @@ exports.queryStudentsList = async (account) => {
     if (!parentId) {
         return [];
     }
-    const classesParents = await mongoModel.famlilyClasses.aggregate([
-        {'$unwind': '$parents'},
-        {'$match': {'parents.parentId': parentId}},
-        {'$project': {'parents.studentId': 1, _id: 0}}
+    const classesParents = await mongoModel.famlilyClasses.aggregate([{
+            '$unwind': '$parents'
+        },
+        {
+            '$match': {
+                'parents.parentId': parentId
+            }
+        },
+        {
+            '$project': {
+                'parents.studentId': 1,
+                _id: 0
+            }
+        }
     ])
     const result = [];
-    for(let i = 0; i < classesParents.length; i++) {
+    for (let i = 0; i < classesParents.length; i++) {
         const studentId = classesParents[i].parents.studentId;
 
         const StudentInfo = await mongoModel.famlilyStudents.find({
             _id: studentId
-        },{
+        }, {
             __v: 0
         })
 
@@ -273,7 +284,17 @@ exports.sign = async (account) => {
     }
     let todayDate = moment(new Date()).utcOffset(8).format('YYYY-MM-DD');
     let addDate = moment(new Date()).utcOffset(8).add(1, 'days').format('YYYY-MM-DD');
-    const result = mongoModel.famlilyUser.findOneAndUpdate({_id: parentId, "eMoney.signedDate": {$lte : todayDate}}, {$inc:{"eMoney.money": 10}, "eMoney.signedDate": addDate});
+    const result = mongoModel.famlilyUser.findOneAndUpdate({
+        _id: parentId,
+        "eMoney.signedDate": {
+            $lte: todayDate
+        }
+    }, {
+        $inc: {
+            "eMoney.money": 10
+        },
+        "eMoney.signedDate": addDate
+    });
     return result;
 }
 /**

@@ -3,7 +3,7 @@
  */
 
 const eleccarService = require("../service/eleccar");
-
+const diffChePaiReg = /^(ps|PER|PS)/;
 /**
  * 获取电车列表
  */
@@ -22,7 +22,7 @@ router.post("/getElecCarList", async (req, res) => {
   const electicCarList = await eleccarService.getElecCarList(carUserIdNum, carToken);
   let result = [];
   if (electicCarList.length > 0) {
-    result = electicCarList.filter(obj => !(/^[ps]|^[PER]|^[PS]/.test(obj.code)))
+    result = electicCarList.filter(obj => !(diffChePaiReg.test(obj.code)))
   }
   res.json({
     status: 200,
@@ -176,7 +176,7 @@ router.post("/getProtectPersonList", async (req, res) => {
   const electicCarList = await eleccarService.getElecCarList(carUserIdNum, carToken);
   let result = [];
   if (electicCarList.length > 0) {
-    result = electicCarList.filter(obj => (/^[ps]|^[PER]|^[PS]/.test(obj.code)))
+    result = electicCarList.filter(obj => (diffChePaiReg.test(obj.code)))
   }
   res.json({
     status: 200,
