@@ -19,7 +19,11 @@ router.post("/getElecCarList", async (req, res) => {
     return;
   }
   const carUserIdNum = carUserInfo.usersOfSys.map(obj => obj.account);
-  const result = await eleccarService.getElecCarList(carUserIdNum, carToken);
+  const electicCarList = await eleccarService.getElecCarList(carUserIdNum, carToken);
+  let result = [];
+  if (electicCarList.length > 0) {
+    result = electicCarList.filter(obj => !(/^[ps]|^[PER]|^[PS]/.test(obj.code)))
+  }
   res.json({
     status: 200,
     result
@@ -92,7 +96,7 @@ router.post("/lockElectricCar", async (req, res) => {
     });
     return;
   }
-  const lockState = req.body.lockState && req.body.lockState == "lock" ? 0 : 1;
+  const lockState = parseInt(req.body.lockState || 0);
   const result = await eleccarService.lockElectricCar(carToken, elecCarUserId, eviId, lockState);
   res.json({
     status: 200,
@@ -152,4 +156,31 @@ router.post('/getEleticCarLastPoint', async (req, res) => {
     result: result
   })
 })
+
+
+/**
+ * 获取守护人员列表
+ */
+router.post("/getProtectPersonList", async (req, res) => {
+  const carToken = req.user.cartoken;
+  const carUserId = "5cb945a0cce17f3e61ab69ea"; //req.user.carUserId;
+  const carUserInfo = await eleccarService.getElecticCarUserInfo(carUserId, carToken);
+  if (!carUserInfo || carUserInfo.length == 0 || carUserInfo.usersOfSys.length == 0) {
+    res.json({
+      status: 200,
+      result: []
+    });
+    return;
+  }
+  const carUserIdNum = carUserInfo.usersOfSys.map(obj => obj.account);
+  const electicCarList = await eleccarService.getElecCarList(carUserIdNum, carToken);
+  let result = [];
+  if (electicCarList.length > 0) {
+    result = electicCarList.filter(obj => (/^[ps]|^[PER]|^[PS]/.test(obj.code)))
+  }
+  res.json({
+    status: 200,
+    result
+  });
+});
 module.exports = router;

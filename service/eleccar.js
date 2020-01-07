@@ -39,7 +39,7 @@ exports.getElecticCarUserInfo = async (carUserId, carToken) => {
       authorization: carToken
     }
   });
-  log(42, result)
+  log(42, result.data)
   return result && result.data;
 };
 
@@ -83,7 +83,7 @@ exports.getElectCarGuiJi = async (code, startDate, endDate, carToken) => {
  */
 exports.lockElectricCar = async (carToken, userId, eviId, lockState) => {
   const result = await axios({
-    method: "POST",
+    method: "post",
     url: "https://app.hbzner.com/api/Vehicle/Lock",
     headers: {
       authorization: carToken
