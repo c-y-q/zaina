@@ -1,4 +1,4 @@
-const configEnvPath = `../config/${process.env.ENV || 'dev'}`;
+const configEnvPath = `../config/${process.env.NODE_ENV|| 'dev'}`;
 const express = require('express');
 global.axios = require('axios');
 global.fs = require('fs');
