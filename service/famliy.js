@@ -60,7 +60,7 @@ exports.findChildrenByParentPhone = async (account) => {
                 }
             }
             classesInfos[i].parents[p].student.score = {
-                jieji,
+                jiji,
                 xiaoji
             };
         }
