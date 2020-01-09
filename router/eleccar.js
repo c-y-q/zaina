@@ -3,7 +3,7 @@
  */
 
 const eleccarService = require("../service/eleccar");
-const diffChePaiReg = /^(ps|PER|PS)/;
+const diffChePaiReg = /^(ps|PER|PS|PR)/;
 /**
  * 获取电车列表
  */
@@ -183,4 +183,85 @@ router.post("/getProtectPersonList", async (req, res) => {
     result
   });
 });
+
+/**
+ * 身份证号和密码登录
+ */
+router.post('/loginByIdNum', async (req, res) => {
+  const {
+    idNum,
+    password
+  } = req.body;
+  const account = req.user.account;
+  if (!idNum || !password) {
+    res.json({
+      status: 1001,
+      msg: "缺少idNum |password 参数"
+    });
+    return;
+  }
+  if (!validate.idCardNum(idNum)) {
+    res.json({
+      status: 1001,
+      msg: "身份证格式错误!"
+    });
+    return;
+  }
+  const carInfo = await axios({
+    method: "post",
+    url: "https://api.hbzner.com/v1/getToken",
+    data: {
+      type: "sys",
+      account: idNum,
+      password: tools.deByDESModeCBC().encryptCBC(password)
+    }
+  });
+  const idCardNumToken = `Bearer ${carInfo && carInfo.data.token}`;
+  cache.set(`zainaicar_${account}`, `${idNum}`, "EX", 60 * 120 * 1000);
+  res.json({
+    status: 200,
+    idCardNumToken
+  })
+})
+
+/**
+ * 当手机号登录没有电车信息时，根据输入的身份证号和密码登录，获取电车信息列表
+ */
+router.post('/getElecticListByIdCardNumToken', async (req, res) => {
+  const idCardNumToken = req.body.idCardNumToken;
+  const account = req.user.account;
+  const idCardNumTokenKey = `zainaicar_${account}`;
+  const idNum = await cache.get(idCardNumTokenKey);
+  log(233, idNum)
+  const electicCarList = await eleccarService.getElecCarList([idNum], idCardNumToken);
+  let result = [];
+  if (electicCarList.length > 0) {
+    result = electicCarList.filter(obj => !(diffChePaiReg.test(obj.code)))
+  }
+  res.json({
+    status: 200,
+    result
+  });
+})
+
+/**
+ * 当手机号登录没有守护人员信息时，根据输入的身份证号和密码登录，获取守护人员信息列表
+ */
+router.post('/getProtectedPeopleListByIdCardNumToken', async (req, res) => {
+  const idCardNumToken = req.body.idCardNumToken;
+  const account = req.user.account;
+  const idCardNumTokenKey = `zainaicar_${account}`;
+  const idNum = await cache.get(idCardNumTokenKey);
+  log(253, idNum)
+  const electicCarList = await eleccarService.getElecCarList([idNum], idCardNumToken);
+  let result = [];
+  if (electicCarList.length > 0) {
+    result = electicCarList.filter(obj => diffChePaiReg.test(obj.code));
+  }
+  res.json({
+    status: 200,
+    result
+  });
+})
+
 module.exports = router;
