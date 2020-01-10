@@ -217,6 +217,7 @@ router.post('/loginByIdNum', async (req, res) => {
         password: tools.deByDESModeCBC().encryptCBC(password)
       }
     });
+    log(220, carInfo)
     const idCardNumToken = `Bearer ${carInfo && carInfo.data.token}`;
     cache.set(`zainaicar_${account}`, `${idNum}`, "EX", 60 * 120 * 1000);
     res.json({
@@ -226,7 +227,7 @@ router.post('/loginByIdNum', async (req, res) => {
   } catch (error) {
     res.json({
       status: 403,
-      msg: '账号或密码错误！'
+      respMsg: "账号或密码错误!"
     })
   }
 
