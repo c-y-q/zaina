@@ -207,21 +207,29 @@ router.post('/loginByIdNum', async (req, res) => {
     });
     return;
   }
-  const carInfo = await axios({
-    method: "post",
-    url: "https://api.hbzner.com/v1/getToken",
-    data: {
-      type: "sys",
-      account: idNum,
-      password: tools.deByDESModeCBC().encryptCBC(password)
-    }
-  });
-  const idCardNumToken = `Bearer ${carInfo && carInfo.data.token}`;
-  cache.set(`zainaicar_${account}`, `${idNum}`, "EX", 60 * 120 * 1000);
-  res.json({
-    status: 200,
-    idCardNumToken
-  })
+  try {
+    const carInfo = await axios({
+      method: "post",
+      url: "https://api.hbzner.com/v1/getToken",
+      data: {
+        type: "sys",
+        account: idNum,
+        password: tools.deByDESModeCBC().encryptCBC(password)
+      }
+    });
+    const idCardNumToken = `Bearer ${carInfo && carInfo.data.token}`;
+    cache.set(`zainaicar_${account}`, `${idNum}`, "EX", 60 * 120 * 1000);
+    res.json({
+      status: 200,
+      idCardNumToken
+    })
+  } catch (error) {
+    res.json({
+      status: 403,
+      msg: '账号或密码错误！'
+    })
+  }
+
 })
 
 /**
