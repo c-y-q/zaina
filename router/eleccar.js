@@ -9,7 +9,7 @@ const diffChePaiReg = /^(ps|PER|PS|PR)/;
  */
 router.post("/getElecCarList", async (req, res) => {
   const carToken = req.user.cartoken;
-  const carUserId = "5cb945a0cce17f3e61ab69ea"; //req.user.carUserId;
+  const carUserId = process.env.NODE_ENV == 'dev' ? "5cb945a0cce17f3e61ab69ea" : req.user.carUserId;
   const carUserInfo = await eleccarService.getElecticCarUserInfo(carUserId, carToken);
   if (!carUserInfo || carUserInfo.length == 0 || carUserInfo.usersOfSys.length == 0) {
     res.json({
@@ -18,11 +18,25 @@ router.post("/getElecCarList", async (req, res) => {
     });
     return;
   }
-  const carUserIdNum = carUserInfo.usersOfSys.map(obj => obj.account);
-  const electicCarList = await eleccarService.getElecCarList(carUserIdNum, carToken);
+  const carUserIdNum = carUserInfo.usersOfSys.map(obj => obj.account)[0] || '';
+  const electicCarList = await eleccarService.getElecCarList(carUserIdNum);
   let result = [];
   if (electicCarList.length > 0) {
     result = electicCarList.filter(obj => !(diffChePaiReg.test(obj.code)))
+  }
+  if (result.length > 0) {
+    result = result.map(obj => {
+      return {
+        "userId": userStr.elecCarUserId || '',
+        "eviId": obj.ID || '',
+        "code": obj.Code,
+        "registDate": obj.RegistDate,
+        "ownerID": obj.OwnerID,
+        "ownerName": obj.OwnerName,
+        "lockState": obj.State, //1:lock,0:unlock
+        "battery": obj.BatteryState || 0
+      }
+    })
   }
   res.json({
     status: 200,
@@ -34,9 +48,8 @@ router.post("/getElecCarList", async (req, res) => {
  * 获取人员轨迹
  */
 router.post("/getPeopleGuiJi", async (req, res) => {
-  const carToken = req.user.cartoken;
-  const epc = req.body.epc;
-  if (!epc) {
+  const code = req.body.code;
+  if (!code) {
     res.json({
       status: 200,
       result: {
@@ -49,7 +62,7 @@ router.post("/getPeopleGuiJi", async (req, res) => {
   }
   const startDate = req.body.startDate || moment().subtract(2, "days").format("YYYY/MM/DD HH:mm:ss");
   const endDate = req.body.endDate || moment().format("YYYY/MM/DD HH:mm:ss");
-  const result = await eleccarService.getPeopleGuiJi(carToken, encodeURIComponent(epc), encodeURIComponent(startDate), encodeURIComponent(endDate));
+  const result = await eleccarService.getPeopleGuiJi(encodeURIComponent(code), encodeURIComponent(startDate), encodeURIComponent(endDate));
   res.json({
     status: 200,
     result
@@ -60,7 +73,6 @@ router.post("/getPeopleGuiJi", async (req, res) => {
  * 获取电车轨迹
  */
 router.post("/getElectCarGuiJi", async (req, res) => {
-  const carToken = req.user.cartoken;
   const chePaiCode = req.body.code;
   if (!chePaiCode) {
     res.json({
@@ -75,7 +87,7 @@ router.post("/getElectCarGuiJi", async (req, res) => {
   }
   const startDate = req.body.startDate || moment().subtract(2, "days").format("YYYY/MM/DD HH:mm:ss");
   const endDate = req.body.endDate || moment().format("YYYY/MM/DD HH:mm:ss");
-  const result = await eleccarService.getElectCarGuiJi(encodeURIComponent(chePaiCode), encodeURIComponent(startDate), encodeURIComponent(endDate), carToken);
+  const result = await eleccarService.getElectCarGuiJi(encodeURIComponent(chePaiCode), encodeURIComponent(startDate), encodeURIComponent(endDate));
   res.json({
     status: 200,
     result
@@ -86,7 +98,6 @@ router.post("/getElectCarGuiJi", async (req, res) => {
  * 电车上锁解锁
  */
 router.post("/lockElectricCar", async (req, res) => {
-  const carToken = req.user.cartoken;
   const elecCarUserId = req.body.elecCarUserId;
   const eviId = req.body.eviId;
   if (!elecCarUserId) {
@@ -97,7 +108,7 @@ router.post("/lockElectricCar", async (req, res) => {
     return;
   }
   const lockState = parseInt(req.body.lockState || 0);
-  const result = await eleccarService.lockElectricCar(carToken, elecCarUserId, eviId, lockState);
+  const result = await eleccarService.lockElectricCar(elecCarUserId, eviId, lockState);
   res.json({
     status: 200,
     result: result
@@ -137,7 +148,6 @@ router.post('/getEeticCarNoticeList', async (req, res) => {
  * 获取最后一个点位
  */
 router.post('/getEleticCarLastPoint', async (req, res) => {
-  const carToken = req.user.cartoken;
   const chePaiCode = req.body.code;
   if (!chePaiCode) {
     res.json({
@@ -150,7 +160,7 @@ router.post('/getEleticCarLastPoint', async (req, res) => {
     });
     return;
   }
-  const result = await eleccarService.getEleticCarLastPoint(carToken, chePaiCode);
+  const result = await eleccarService.getEleticCarLastPoint(chePaiCode);
   res.json({
     status: 200,
     result: result
@@ -163,7 +173,7 @@ router.post('/getEleticCarLastPoint', async (req, res) => {
  */
 router.post("/getProtectPersonList", async (req, res) => {
   const carToken = req.user.cartoken;
-  const carUserId = "5cb945a0cce17f3e61ab69ea"; //req.user.carUserId;
+  const carUserId = process.env.NODE_ENV == 'dev' ? "5cb945a0cce17f3e61ab69ea" : req.user.carUserId;
   const carUserInfo = await eleccarService.getElecticCarUserInfo(carUserId, carToken);
   if (!carUserInfo || carUserInfo.length == 0 || carUserInfo.usersOfSys.length == 0) {
     res.json({
@@ -172,8 +182,8 @@ router.post("/getProtectPersonList", async (req, res) => {
     });
     return;
   }
-  const carUserIdNum = carUserInfo.usersOfSys.map(obj => obj.account);
-  const electicCarList = await eleccarService.getElecCarList(carUserIdNum, carToken);
+  const carUserIdNum = carUserInfo.usersOfSys.map(obj => obj.account)[0] || '';
+  const electicCarList = await eleccarService.getElecCarList(carUserIdNum);
   let result = [];
   if (electicCarList.length > 0) {
     result = electicCarList.filter(obj => (diffChePaiReg.test(obj.code)))
@@ -208,17 +218,24 @@ router.post('/loginByIdNum', async (req, res) => {
     return;
   }
   try {
-    const carInfo = await axios({
-      method: "post",
-      url: "https://api.hbzner.com/v1/getToken",
-      data: {
-        type: "sys",
-        account: idNum,
-        password: tools.deByDESModeCBC().encryptCBC(password)
-      }
-    });
-    const idCardNumToken = `Bearer ${carInfo && carInfo.data.token}`;
-    cache.set(`zainaicar_${account}`, `${idNum}`, "EX", 60 * 120 * 1000);
+    const carUserInfoRes = await eleccarService.getEleticCarUserInfo(idNum, password);
+    if (!(carUserInfoRes.data && carUserInfoRes.data.Result == 200)) {
+      res.json({
+        status: 205,
+        msg: "账号或密码错误!"
+      })
+      return;
+    }
+    const tokenParam = {
+      carUserInfo: carUserInfoRes && carUserInfoRes.data.Data || '',
+      elecCarUserId: carUserInfoRes && carUserInfoRes.data.Data.UserID || '',
+      account: account,
+      uuid: tools.uuid(),
+      visitIP: req.ip,
+      expires: new Date().getTime()
+    };
+    const idCardNumToken = tools.createToken(tokenParam, cert.private);
+    cache.set(`eletric_${account}`, JSON.stringify(tokenParam), "EX", 60 * 120 * 1000);
     res.json({
       status: 200,
       idCardNumToken
@@ -238,13 +255,36 @@ router.post('/loginByIdNum', async (req, res) => {
 router.post('/getElecticListByIdCardNumToken', async (req, res) => {
   const idCardNumToken = req.body.idCardNumToken;
   const account = req.user.account;
-  const idCardNumTokenKey = `zainaicar_${account}`;
-  const idNum = await cache.get(idCardNumTokenKey);
-  log(233, idNum)
-  const electicCarList = await eleccarService.getElecCarList([idNum], idCardNumToken);
+  const idCardNumTokenKey = `eletric_${account}`;
+  const tokenObj = tools.verifyToken(idCardNumToken, cert.public);
+  const redisUserInfo = await cache.get(idCardNumTokenKey);
+  const userStr = redisUserInfo && JSON.parse(redisUserInfo);
+  if (!redisUserInfo || !(tokenObj.uuid == userStr.uuid)) {
+    res.json({
+      status: 403,
+      msg: "token is wrong!"
+    })
+    return;
+  }
+  const idNum = userStr && userStr.carUserInfo.Account || '';
+  const electicCarList = await eleccarService.getCarListByIdNumToken(idCardNumToken, idNum);
   let result = [];
   if (electicCarList.length > 0) {
     result = electicCarList.filter(obj => !(diffChePaiReg.test(obj.code)))
+  }
+  if (result.length > 0) {
+    result = result.map(obj => {
+      return {
+        "userId": userStr.elecCarUserId || '',
+        "eviId": obj.ID || '',
+        "code": obj.Code,
+        "registDate": obj.RegistDate,
+        "ownerID": obj.OwnerID,
+        "ownerName": obj.OwnerName,
+        "lockState": obj.State, //1:lock,0:unlock
+        "battery": obj.BatteryState || 0
+      }
+    })
   }
   res.json({
     status: 200,
@@ -258,14 +298,40 @@ router.post('/getElecticListByIdCardNumToken', async (req, res) => {
 router.post('/getProtectedPeopleListByIdCardNumToken', async (req, res) => {
   const idCardNumToken = req.body.idCardNumToken;
   const account = req.user.account;
-  const idCardNumTokenKey = `zainaicar_${account}`;
-  const idNum = await cache.get(idCardNumTokenKey);
-  log(253, idNum)
-  const electicCarList = await eleccarService.getElecCarList([idNum], idCardNumToken);
+  const idCardNumTokenKey = `eletric_${account}`;
+  const tokenObj = tools.verifyToken(idCardNumToken, cert.public);
+  const redisUserInfo = await cache.get(idCardNumTokenKey);
+  const userStr = redisUserInfo && JSON.parse(redisUserInfo);
+  if (!redisUserInfo || !(tokenObj.uuid == userStr.uuid)) {
+    res.json({
+      status: 403,
+      msg: "token is wrong!"
+    })
+    return;
+  }
+  const idNum = userStr && userStr.carUserInfo.Account || '';
+  log(290, idNum)
+  const electicCarList = await eleccarService.getCarListByIdNumToken(idCardNumToken, idNum);
   let result = [];
   if (electicCarList.length > 0) {
-    result = electicCarList.filter(obj => diffChePaiReg.test(obj.code));
+    result = electicCarList.filter(obj => (diffChePaiReg.test(obj.code)));
+
   }
+  if (result.length > 0) {
+    result = result.map(obj => {
+      return {
+        "userId": userStr.elecCarUserId || '',
+        "eviId": obj.ID || '',
+        "code": obj.Code,
+        "registDate": obj.RegistDate,
+        "ownerID": obj.OwnerID,
+        "ownerName": obj.OwnerName,
+        "lockState": obj.State,
+        "battery": obj.BatteryState || 0
+      }
+    })
+  }
+
   res.json({
     status: 200,
     result

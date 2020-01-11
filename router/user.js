@@ -9,9 +9,8 @@ const famlilySerive = require('../service/famliy');
 
 router.post("/findUserInfo", async (req, res) => {
   const carToken = req.user.cartoken;
-  // const carUserId = req.user.carUserId;
   const phone = req.user.account;
-  const userId = '5cb945a0cce17f3e61ab69ea';
+  const carUserId = process.env.NODE_ENV == 'dev' ? "5cb945a0cce17f3e61ab69ea" : req.user.carUserId;
   const pet = await petService.getPetNum(phone);
   // 查询本用户金币
   const signmoney = await famlilySerive.findmoney(phone);
@@ -24,12 +23,12 @@ router.post("/findUserInfo", async (req, res) => {
     panduan = false;
   }
   const family = await famlilySerive.queryStudentsList(phone);
-  const carUserInfo = await eleccarService.getElecticCarUserInfo(userId, carToken);
+  const carUserInfo = await eleccarService.getElecticCarUserInfo(carUserId, carToken);
   if (!carUserInfo || carUserInfo.length == 0 || carUserInfo.usersOfSys.length == 0) {
     return [];
   }
-  const carUserIdNum = carUserInfo.usersOfSys.map(obj => obj.account);
-  const eleccar = await eleccarService.getElecCarnumber(carUserIdNum, carToken);
+  const carUserIdNum = carUserInfo.usersOfSys.map(obj => obj.account)[0] || '';
+  const eleccar = await eleccarService.getElecCarnumber(carUserIdNum);
   res.json({
     status: 200,
     result: {

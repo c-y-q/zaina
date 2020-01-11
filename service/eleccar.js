@@ -1,31 +1,38 @@
 /**
  * 获取电车列表
  */
-exports.getElecCarList = async (idNum, carToken) => {
+exports.getElecCarList = async (idNum) => {
   const result = await axios({
     method: "POST",
-    url: `https://api.hbzner.com/v1/vehicles`,
-    headers: {
-      authorization: carToken
-    },
-    data: idNum
+    url: `https://app.hbzner.com/api/Vehicle/QueryAllList`,
+    data: {
+      "key": "",
+      "UserID": "",
+      "Data": {
+        "Account": idNum
+      }
+    }
   });
-  return (result && result.data) || "";
+ 
+  return (result && result.data.Data) || "";
 };
 
-exports.getElecCarnumber = async (idNum, carToken) => {
+exports.getElecCarnumber = async (idNum) => {
   const result = await axios({
     method: "POST",
-    url: `https://api.hbzner.com/v1/vehicles`,
-    headers: {
-      authorization: carToken
-    },
-    data: idNum
+    url: `https://app.hbzner.com/api/Vehicle/QueryAllList`,
+    data: {
+      "key": "",
+      "UserID": "",
+      "Data": {
+        "Account": idNum
+      }
+    }
   });
   if (result.data.length == 0) {
     return '暂无车辆';
   }
-  return (result && result.data[0].code) || "暂无车辆";
+  return (result && result.data.Data[0].code) || "暂无车辆";
 };
 
 /**
@@ -46,34 +53,18 @@ exports.getElecticCarUserInfo = async (carUserId, carToken) => {
 /**
  * 获取人员轨迹
  */
-exports.getPeopleGuiJi = async (carToken, epc, startDate, endDate) => {
-  // const result = await axios({
-  //     method: 'post',
-  //     url: "http://183.196.90.14:9016/api/Gis/QueryEVITrackList",
-  //     headers: {
-  //         'authorization': carToken
-  //     },
-  //     data: {
-  //         epc: epc,
-  //         starttime: startDate,
-  //         endtime: endDate
-  //     }
-  // })
-  // return result.data || [];
-  return this.getElectCarGuiJi(epc, startDate, endDate, carToken);
+exports.getPeopleGuiJi = async (epc, startDate, endDate) => {
+  return this.getElectCarGuiJi(epc, startDate, endDate);
 };
 
 /**
  * 获取电车轨迹
  */
-exports.getElectCarGuiJi = async (code, startDate, endDate, carToken) => {
+exports.getElectCarGuiJi = async (code, startDate, endDate) => {
   const url = `https://app.hbzner.com/api/Gis/QueryTrackList?code=${code}&startTime=${startDate}&endTime=${endDate}`;
   const result = await axios({
     method: "post",
-    url: url,
-    headers: {
-      authorization: carToken
-    }
+    url: url
   });
   return result.data || [];
 };
@@ -81,13 +72,10 @@ exports.getElectCarGuiJi = async (code, startDate, endDate, carToken) => {
 /**
  * 电车上锁
  */
-exports.lockElectricCar = async (carToken, userId, eviId, lockState) => {
+exports.lockElectricCar = async (userId, eviId, lockState) => {
   const result = await axios({
     method: "post",
     url: "https://app.hbzner.com/api/Vehicle/Lock",
-    headers: {
-      authorization: carToken
-    },
     data: {
       key: null,
       "UserId": `${userId}`,
@@ -115,14 +103,48 @@ exports.getEeticCarNoticeList = async (mobile, page, carToken) => {
   return result.data || [];
 }
 
-exports.getEleticCarLastPoint = async (carToken, chePaiCode) => {
+exports.getEleticCarLastPoint = async (chePaiCode) => {
   const url = `https://app.hbzner.com/api/Gis/GetLastTrack?code=${encodeURIComponent(chePaiCode)}`;
   const result = await axios({
     method: "get",
-    url: url,
-    headers: {
-      authorization: carToken
-    }
+    url: url
   });
   return result.data;
+}
+
+/**
+ * 获取电车平台token
+ */
+exports.getEleticCarUserInfo = async (idNum, password) => {
+  const result = await axios({
+    method: 'POST',
+    url: 'https://app.hbzner.com/api/User/Login',
+    data: {
+      "key": "",
+      "UserID": "",
+      "Data": {
+        "Account": `${idNum}`,
+        "Password": `${password}`
+      }
+    }
+  })
+  return result;
+}
+
+/**
+ * idNumberToken获取列表
+ */
+exports.getCarListByIdNumToken = async (carToken, idNum) => {
+  const result = await axios({
+    method: "post",
+    url: `https://app.hbzner.com/api/Vehicle/QueryAllList`,
+    data: {
+      "key": "",
+      "UserID": "",
+      "Data": {
+        "Account": idNum
+      }
+    }
+  });
+  return result.data.Data;
 }
