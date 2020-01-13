@@ -9,7 +9,6 @@ const famlilySerive = require('../service/famliy');
 
 router.post("/findUserInfo", async (req, res) => {
   const account = req.user.account;
-  const userRes = await userService.findUserByAccount(account);
   const pet = await petService.getPetNum(account);
   // 查询本用户金币
   const signmoney = await famlilySerive.findmoney(account);
@@ -21,16 +20,10 @@ router.post("/findUserInfo", async (req, res) => {
   if (todayDate < signmoney.signedDate) {
     panduan = false;
   }
-  const phones = userRes && userRes.family && userRes.family.phone || [];
-  let family = [];
-  if (phones.length > 0) {
-    for (let mobile of phones) {
-      let fam = await famlilySerive.queryStudentsList(mobile);
-      family.push(fam);
-    }
-  }
-  const idNums = userRes && userRes.car && userRes.car.length > 0 && userRes.car.map(obj => obj.idNums)[0] || [];
-  const eleccar = await eleccarService.getElecCarList(idNums);
+  const family = await famlilySerive.queryStudentsList(account);
+  const userRes = await userService.findUserByAccount(account);
+  const idNums = userRes && userRes.car && userRes.car.length > 0 && userRes.car.map(obj => obj.idNums)[0] || '';
+  const eleccar = await eleccarService.getElecCarnumber(idNums);
   res.json({
     status: 200,
     result: {

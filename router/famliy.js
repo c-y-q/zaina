@@ -1,12 +1,20 @@
 const famlilySerive = require("../service/famliy");
 const eleccarService = require("../service/eleccar");
+const userService = require("../service/user");
 /**
  * 获取孩子头像，孩子名字，孩子所在班级,孩子点评
  * todo:孩子考勤，进门出门时间
  */
 router.post("/findChildrenByParentPhone", async (req, res) => {
     const account = req.user.account;
-    const result = await famlilySerive.findChildrenByParentPhone(account);
+    const userRes = await userService.findUserByAccount(account);
+    const carInfoArr = userRes && userRes.famlily || [];
+    let accounts = [account];
+    if (carInfoArr.length > 0) {
+        let famlilyPhones = carInfoArr.map(obj => obj.phone);
+        accounts = accounts.concat(famlilyPhones);
+    }
+    const result = await famlilySerive.findChildrenByParentPhone(accounts);
     res.json({
         status: 200,
         result
@@ -18,10 +26,17 @@ router.post("/findChildrenByParentPhone", async (req, res) => {
  */
 router.post("/getHomeworkInformList", async (req, res) => {
     const account = req.user.account;
+    const userRes = await userService.findUserByAccount(account);
+    const carInfoArr = userRes && userRes.famlily || [];
+    let accounts = [account];
+    if (carInfoArr.length > 0) {
+        let famlilyPhones = carInfoArr.map(obj => obj.phone);
+        accounts = accounts.concat(famlilyPhones);
+    }
     let pageSize = parseInt(req.body.pageSize) || 5;
     let pageIndex = parseInt(req.body.pageIndex) || 1;
     const result = await famlilySerive.getHomeworkInformList(
-        account,
+        accounts,
         pageSize,
         pageIndex
     );
@@ -35,8 +50,15 @@ router.post("/getGongGaoInformList", async (req, res) => {
     const account = req.user.account;
     let pageSize = parseInt(req.body.pageSize) || 5;
     let pageIndex = parseInt(req.body.pageIndex) || 1;
+    const userRes = await userService.findUserByAccount(account);
+    const carInfoArr = userRes && userRes.famlily || [];
+    let accounts = [account];
+    if (carInfoArr.length > 0) {
+        let famlilyPhones = carInfoArr.map(obj => obj.phone);
+        accounts = accounts.concat(famlilyPhones);
+    }
     const result = await famlilySerive.getGongGaoInformList(
-        account,
+        accounts,
         pageSize,
         pageIndex
     );
@@ -104,6 +126,13 @@ router.post("/familyLogin", async (req, res) => {
         });
         return;
     }
+    if (account == userAccount) {
+        res.json({
+            status: 401,
+            msg: "请勿重复登录！"
+        });
+        return;
+    }
     try {
         const carInfo = await axios({
             method: "post",
@@ -115,6 +144,7 @@ router.post("/familyLogin", async (req, res) => {
             }
         });
         const famlilyUserId = carInfo && carInfo.data._id;
+        await userService.pushFamlilyPhone(account, famlilyUserId)
         //carToken:请求电车平台需要的token,id
         const tokenParam = {
             userId: famlilyUserId,
@@ -159,7 +189,8 @@ router.post("/findChildrenByParentAnotherPhone", async (req, res) => {
         return;
     }
     const phone = (userStr && userStr.account) || "";
-    const result = await famlilySerive.findChildrenByParentPhone(phone);
+    let accounts = [phone];
+    const result = await famlilySerive.findChildrenByParentPhone(accounts);
     res.json({
         status: 200,
         result

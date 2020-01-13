@@ -1,13 +1,19 @@
 /**
  * 根据家长手机号查询小孩数据
  */
-exports.findChildrenByParentPhone = async (account) => {
-    const parentId = await getParentId(account);
-    if (!parentId) {
+exports.findChildrenByParentPhone = async (accounts) => {
+    let parentIds = [];
+    for (let account of accounts) {
+        let parentId = await getParentId(account);
+        parentIds.push(parentId);
+    }
+    if (!parentIds.length) {
         return [];
     }
     const classesParents = await mongoModel.famlilyClasses.find({
-        'parents.parentId': parentId
+        'parents.parentId': {
+            $in: parentIds
+        }
     }, {
         _id: 1,
         grade: 1,
@@ -80,9 +86,13 @@ exports.findmoney = async (account) => {
     return result.eMoney;
 }
 
-exports.queryStudentsList = async (account) => {
-    const parentId = await getParentId(account);
-    if (!parentId) {
+exports.queryStudentsList = async (accounts) => {
+    let parentIds = [];
+    for (let account of accounts) {
+        let parentId = await getParentId(account);
+        parentIds.push(parentId);
+    }
+    if (!parentIds.length) {
         return [];
     }
     const classesParents = await mongoModel.famlilyClasses.aggregate([{
@@ -90,7 +100,9 @@ exports.queryStudentsList = async (account) => {
         },
         {
             '$match': {
-                'parents.parentId': parentId
+                'parents.parentId': {
+                    $in: parentIds
+                }
             }
         },
         {
@@ -114,16 +126,16 @@ exports.queryStudentsList = async (account) => {
     }
 
     if (result.length == 0) {
-        return '';
+        return '暂无信息';
     }
 
-    return result[0] && result[0].name || '';
+    return result[0] && result[0].name || '暂无信息';
 }
 
 /**
  * 获取作业列表
  */
-exports.getHomeworkInformList = async (account, pageSize, pageIndex) => {
+exports.getHomeworkInformList = async (accounts, pageSize, pageIndex) => {
     if (pageIndex < 1) {
         pageIndex = 1;
     }
@@ -137,12 +149,18 @@ exports.getHomeworkInformList = async (account, pageSize, pageIndex) => {
         pageSize,
         homeworkList: []
     };
-    const parentId = await getParentId(account);
-    if (!parentId) {
+    let parentIds = [];
+    for (let account of accounts) {
+        let parentId = await getParentId(account);
+        parentIds.push(parentId);
+    }
+    if (!parentIds.length) {
         return resTempate;
     }
     const classIds = await mongoModel.famlilyClasses.find({
-        "parents.parentId": parentId
+        "parents.parentId": {
+            $in: parentIds
+        }
     }, {
         _id: 1
     })
@@ -206,7 +224,7 @@ exports.getHomeworkInformList = async (account, pageSize, pageIndex) => {
  * 
  * 获取通知列表
  */
-exports.getGongGaoInformList = async (account, pageSize, pageIndex) => {
+exports.getGongGaoInformList = async (accounts, pageSize, pageIndex) => {
     if (pageIndex < 1) {
         pageIndex = 1;
     }
@@ -220,12 +238,18 @@ exports.getGongGaoInformList = async (account, pageSize, pageIndex) => {
         pageSize,
         gongGaoList: []
     };
-    const parentId = await getParentId(account);
-    if (!parentId) {
+    let parentIds = [];
+    for (let account of accounts) {
+        let parentId = await getParentId(account);
+        parentIds.push(parentId);
+    }
+    if (!parentIds.length) {
         return resTempate;
     }
     const classIds = await mongoModel.famlilyClasses.find({
-        "parents.parentId": parentId
+        "parents.parentId": {
+            $in: parentIds
+        }
     }, {
         _id: 1
     })

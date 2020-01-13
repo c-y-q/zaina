@@ -19,11 +19,14 @@ module.exports = new mongoose.Schema({
       type: String
     }
   }],
-  family: {
+  family: [{
     phone: {
-      type: Array
+      type: String,
+    },
+    userId: {
+      type: String
     }
-  }
+  }]
 }, {
   collection: "zaina_app_user"
 });

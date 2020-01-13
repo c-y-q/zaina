@@ -261,7 +261,7 @@ router.post('/loginByIdNum', async (req, res) => {
     }
     const elecCarUserId = carUserInfoRes.data.Data.UserID || '';
     //在哪app和身份证号码绑定
-    await userService.pushCarIdNum(idNum, elecCarUserId);
+    await userService.pushCarIdNum(account, idNum, elecCarUserId);
     const tokenParam = {
       carUserInfo: carUserInfoRes && carUserInfoRes.data.Data || '',
       elecCarUserId: elecCarUserId,
@@ -277,6 +277,7 @@ router.post('/loginByIdNum', async (req, res) => {
       idCardNumToken
     })
   } catch (error) {
+    log(281, error)
     res.json({
       status: 205,
       msg: "账号或密码错误!"
@@ -313,7 +314,7 @@ router.post('/getElecticListByIdCardNumToken', async (req, res) => {
       return {
         "userId": userStr.elecCarUserId || '',
         "eviId": obj.ID || '',
-        "code": obj.Code,
+        "code": eleccar.Code && eleccar.Code.split('(')[0] || '',
         "registDate": obj.RegistDate,
         "ownerID": obj.OwnerID,
         "ownerName": obj.OwnerName,
@@ -358,7 +359,7 @@ router.post('/getProtectedPeopleListByIdCardNumToken', async (req, res) => {
       return {
         "userId": userStr.elecCarUserId || '',
         "eviId": obj.ID || '',
-        "code": obj.Code,
+        "code": eleccar.Code && eleccar.Code.split('(')[0] || '',
         "registDate": obj.RegistDate,
         "ownerID": obj.OwnerID,
         "ownerName": obj.OwnerName,

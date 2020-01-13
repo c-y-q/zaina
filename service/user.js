@@ -10,9 +10,9 @@ exports.findUser = async (account) => {
     })
 }
 /**
- * 根据在哪app登录使用的手机号，找到，在哪zaina_user表中的_id;
+ * 根据在哪app登录使用的手机号，找到，push car_idNum ,car_userId;
  */
-exports.pushCarIdNum = async (idNum, userId) => {
+exports.pushCarIdNum = async (account, idNum, userId) => {
     const result = await mongoModel.user.findOneAndUpdate({
         userName: account
     }, {
@@ -22,6 +22,8 @@ exports.pushCarIdNum = async (idNum, userId) => {
                 userId: userId
             }
         }
+    }, {
+        upsert: true
     });
     return result && result._id || '';
 }
@@ -34,4 +36,23 @@ exports.findUserByAccount = async (account) => {
         family: 1
     })
     return result || '';
+}
+
+/**
+ * 根据在哪app登录使用的手机号，登录家校惠通，push famlily phone;
+ */
+exports.pushFamlilyPhone = async (account, userId) => {
+    const result = await mongoModel.user.findOneAndUpdate({
+        userName: account
+    }, {
+        $addToSet: {
+            famlily: {
+                phone: account,
+                userId: userId
+            }
+        }
+    }, {
+        upsert: true
+    });
+    return result && result._id || '';
 }
