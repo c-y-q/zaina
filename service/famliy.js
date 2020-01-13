@@ -114,10 +114,10 @@ exports.queryStudentsList = async (account) => {
     }
 
     if (result.length == 0) {
-        return '暂无信息';
+        return '';
     }
 
-    return result[0] && result[0].name || '暂无信息';
+    return result[0] && result[0].name || '';
 }
 
 /**

@@ -8,13 +8,12 @@ const eleccarService = require("../service/eleccar");
 const famlilySerive = require('../service/famliy');
 
 router.post("/findUserInfo", async (req, res) => {
-  const carToken = req.user.cartoken;
-  const phone = req.user.account;
-  const carUserId = process.env.NODE_ENV == 'dev' ? "5cb945a0cce17f3e61ab69ea" : req.user.carUserId;
-  const pet = await petService.getPetNum(phone);
+  const account = req.user.account;
+  const userRes = await userService.findUserByAccount(account);
+  const pet = await petService.getPetNum(account);
   // 查询本用户金币
-  const signmoney = await famlilySerive.findmoney(phone);
-  const user = await userService.findUser(phone);
+  const signmoney = await famlilySerive.findmoney(account);
+  const user = await userService.findUser(account);
   user.money = signmoney.money;
   // 判断今日是否可以签到
   let panduan = true;
@@ -22,13 +21,16 @@ router.post("/findUserInfo", async (req, res) => {
   if (todayDate < signmoney.signedDate) {
     panduan = false;
   }
-  const family = await famlilySerive.queryStudentsList(phone);
-  const carUserInfo = await eleccarService.getElecticCarUserInfo(carUserId, carToken);
-  if (!carUserInfo || carUserInfo.length == 0 || carUserInfo.usersOfSys.length == 0) {
-    return [];
+  const phones = userRes && userRes.family && userRes.family.phone || [];
+  let family = [];
+  if (phones.length > 0) {
+    for (let mobile of phones) {
+      let fam = await famlilySerive.queryStudentsList(mobile);
+      family.push(fam);
+    }
   }
-  const carUserIdNum = carUserInfo.usersOfSys.map(obj => obj.account)[0] || '';
-  const eleccar = await eleccarService.getElecCarnumber(carUserIdNum);
+  const idNums = userRes && userRes.car && userRes.car.length > 0 && userRes.car.map(obj => obj.idNums)[0] || [];
+  const eleccar = await eleccarService.getElecCarList(idNums);
   res.json({
     status: 200,
     result: {

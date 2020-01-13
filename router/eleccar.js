@@ -1,46 +1,55 @@
 /**
  * 电车平台
  */
-
+const userService = require("../service/user");
 const eleccarService = require("../service/eleccar");
 const diffChePaiReg = /^(ps|PER|PS|PR)/;
 /**
  * 获取电车列表
  */
 router.post("/getElecCarList", async (req, res) => {
-  const carToken = req.user.cartoken;
-  const carUserId = process.env.NODE_ENV == 'dev' ? "5cb945a0cce17f3e61ab69ea" : req.user.carUserId;
-  const carUserInfo = await eleccarService.getElecticCarUserInfo(carUserId, carToken);
-  if (!carUserInfo || carUserInfo.length == 0 || carUserInfo.usersOfSys.length == 0) {
+  const account = req.user.account;
+  const userRes = await userService.findUserByAccount(account);
+  const carInfoArr = userRes && userRes.car || [];
+  const electicCarList = [];
+  if (!carInfoArr.length) {
     res.json({
       status: 200,
       result: []
     });
     return;
   }
-  const carUserIdNum = carUserInfo.usersOfSys.map(obj => obj.account)[0] || '';
-  const electicCarList = await eleccarService.getElecCarList(carUserIdNum);
-  let result = [];
+  const idNums = carInfoArr.map(obj => obj.idNum);
+  for (let idnum of idNums) {
+    let car = await eleccarService.getElecCarList(idnum);
+    electicCarList.push(...car);
+  }
+  let result = [],
+    tores = [];
   if (electicCarList.length > 0) {
     result = electicCarList.filter(obj => !(diffChePaiReg.test(obj.code)))
   }
   if (result.length > 0) {
-    result = result.map(obj => {
-      return {
-        "userId": userStr.elecCarUserId || '',
-        "eviId": obj.ID || '',
-        "code": obj.Code,
-        "registDate": obj.RegistDate,
-        "ownerID": obj.OwnerID,
-        "ownerName": obj.OwnerName,
-        "lockState": obj.State, //1:lock,0:unlock
-        "battery": obj.BatteryState || 0
+    for (let zainaUser of carInfoArr) {
+      for (let eleccar of result) {
+        if (zainaUser.idNum == eleccar.OwnerID) {
+          tores.push({
+            "userId": zainaUser.userId || '',
+            "eviId": eleccar.ID || '',
+            "code": eleccar.Code && eleccar.Code.split('(')[0] || '',
+            "registDate": eleccar.RegistDate,
+            "ownerID": eleccar.OwnerID,
+            "ownerName": eleccar.OwnerName,
+            "lockState": eleccar.State, //1:lock,0:unlock
+            "battery": eleccar.BatteryState || 0
+          })
+        }
       }
-    })
+    }
   }
   res.json({
     status: 200,
-    result
+    result: tores
   });
 });
 
@@ -172,25 +181,48 @@ router.post('/getEleticCarLastPoint', async (req, res) => {
  * 获取守护人员列表
  */
 router.post("/getProtectPersonList", async (req, res) => {
-  const carToken = req.user.cartoken;
-  const carUserId = process.env.NODE_ENV == 'dev' ? "5cb945a0cce17f3e61ab69ea" : req.user.carUserId;
-  const carUserInfo = await eleccarService.getElecticCarUserInfo(carUserId, carToken);
-  if (!carUserInfo || carUserInfo.length == 0 || carUserInfo.usersOfSys.length == 0) {
+  const account = req.user.account;
+  const userRes = await userService.findUserByAccount(account);
+  const carInfoArr = userRes && userRes.car || [];
+  const electicCarList = [];
+  if (!carInfoArr.length) {
     res.json({
       status: 200,
       result: []
     });
     return;
   }
-  const carUserIdNum = carUserInfo.usersOfSys.map(obj => obj.account)[0] || '';
-  const electicCarList = await eleccarService.getElecCarList(carUserIdNum);
-  let result = [];
+  const idNums = carInfoArr.map(obj => obj.idNum);
+  for (let idnum of idNums) {
+    let car = await eleccarService.getElecCarList(idnum);
+    electicCarList.push(...car);
+  }
+  let result = [],
+    tores = [];
   if (electicCarList.length > 0) {
     result = electicCarList.filter(obj => (diffChePaiReg.test(obj.code)))
   }
+  if (result.length > 0) {
+    for (let zainaUser of carInfoArr) {
+      for (let eleccar of result) {
+        if (zainaUser.idNum == eleccar.OwnerID) {
+          tores.push({
+            "userId": zainaUser.userId || '',
+            "eviId": eleccar.ID || '',
+            "code": eleccar.Code && eleccar.Code.split('(')[0] || '',
+            "registDate": eleccar.RegistDate,
+            "ownerID": eleccar.OwnerID,
+            "ownerName": eleccar.OwnerName,
+            "lockState": eleccar.State, //1:lock,0:unlock
+            "battery": eleccar.BatteryState || 0
+          })
+        }
+      }
+    }
+  }
   res.json({
     status: 200,
-    result
+    result: tores
   });
 });
 
@@ -217,6 +249,7 @@ router.post('/loginByIdNum', async (req, res) => {
     });
     return;
   }
+
   try {
     const carUserInfoRes = await eleccarService.getEleticCarUserInfo(idNum, password);
     if (!(carUserInfoRes.data && carUserInfoRes.data.Result == 200)) {
@@ -226,9 +259,12 @@ router.post('/loginByIdNum', async (req, res) => {
       })
       return;
     }
+    const elecCarUserId = carUserInfoRes.data.Data.UserID || '';
+    //在哪app和身份证号码绑定
+    await userService.pushCarIdNum(idNum, elecCarUserId);
     const tokenParam = {
       carUserInfo: carUserInfoRes && carUserInfoRes.data.Data || '',
-      elecCarUserId: carUserInfoRes && carUserInfoRes.data.Data.UserID || '',
+      elecCarUserId: elecCarUserId,
       account: account,
       uuid: tools.uuid(),
       visitIP: req.ip,
