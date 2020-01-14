@@ -12,22 +12,22 @@ module.exports = new mongoose.Schema({
     type: Number
   },
   car: [{
-    _id: false,
     idNum: {
       type: String
     },
     userId: {
       type: String
-    }
+    },
+    _id: false
   }],
   family: [{
-    _id: false,
     phone: {
       type: String,
     },
     userId: {
       type: String
-    }
+    },
+    _id: false
   }]
 }, {
   collection: "zaina_app_user"
