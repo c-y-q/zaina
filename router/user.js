@@ -22,7 +22,7 @@ router.post("/findUserInfo", async (req, res) => {
   }
   const family = await famlilySerive.queryStudentsList(account);
   const userRes = await userService.findUserByAccount(account);
-  const idNums = userRes && userRes.car && userRes.car.length > 0 && userRes.car.map(obj => obj.idNums)[0] || '';
+  const idNums = userRes && userRes.car && userRes.car.length > 0 && userRes.car.map(obj => obj.idNum)[0] || '';
   const eleccar = await eleccarService.getElecCarnumber(idNums);
   res.json({
     status: 200,
