@@ -65,13 +65,13 @@ router.post("/directBindDogRegNum", async (req, res) => {
   //     respMsg: " 已绑定过该号码，请勿重复绑定"
   //   };
   // }
-  const judePetExists = await petService.judePetExists(isfree[0].id);
-  if (!judePetExists) {
-    throw {
-      status: 405,
-      respMsg: " the dog not exists"
-    };
-  }
+  // const judePetExists = await petService.judePetExists(isfree[0].id);
+  // if (!judePetExists) {
+  //   throw {
+  //     status: 405,
+  //     respMsg: " the dog not exists"
+  //   };
+  // }
   await petService.directBindDogRegNum(
     account,
     phone
