@@ -134,7 +134,7 @@ exports.getEleticCarUserInfo = async (idNum, password) => {
 /**
  * idNumberToken获取列表
  */
-exports.getCarListByIdNumToken = async (carToken, idNum) => {
+exports.getCarListByIdNumToken = async (idNum) => {
   const result = await axios({
     method: "post",
     url: `https://app.hbzner.com/api/Vehicle/QueryAllList`,

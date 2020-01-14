@@ -27,7 +27,7 @@ router.post("/getElecCarList", async (req, res) => {
   let result = [],
     tores = [];
   if (electicCarList.length > 0) {
-    result = electicCarList.filter(obj => !(diffChePaiReg.test(obj.code)))
+    result = electicCarList.filter(obj => !(diffChePaiReg.test(obj.Code)))
   }
   if (result.length > 0) {
     for (let zainaUser of carInfoArr) {
@@ -128,7 +128,7 @@ router.post("/lockElectricCar", async (req, res) => {
  * 电车卫士消息列表
  */
 router.post('/getEeticCarNoticeList', async (req, res) => {
-  const mobile = '17831001423' || req.user.account;
+  const mobile = req.user.account;
   const carToken = req.user.cartoken;
   const page = parseInt(req.body.page) || 1;
   const noticeList = await eleccarService.getEeticCarNoticeList(mobile, page, carToken);
@@ -200,7 +200,7 @@ router.post("/getProtectPersonList", async (req, res) => {
   let result = [],
     tores = [];
   if (electicCarList.length > 0) {
-    result = electicCarList.filter(obj => (diffChePaiReg.test(obj.code)))
+    result = electicCarList.filter(obj => (diffChePaiReg.test(obj.Code)))
   }
   if (result.length > 0) {
     for (let zainaUser of carInfoArr) {
@@ -304,10 +304,10 @@ router.post('/getElecticListByIdCardNumToken', async (req, res) => {
     return;
   }
   const idNum = userStr && userStr.carUserInfo.Account || '';
-  const electicCarList = await eleccarService.getCarListByIdNumToken(idCardNumToken, idNum);
+  const electicCarList = await eleccarService.getCarListByIdNumToken(idNum);
   let result = [];
   if (electicCarList.length > 0) {
-    result = electicCarList.filter(obj => !(diffChePaiReg.test(obj.code)))
+    result = electicCarList.filter(obj => !(diffChePaiReg.test(obj.Code)))
   }
   if (result.length > 0) {
     result = result.map(obj => {
@@ -347,19 +347,18 @@ router.post('/getProtectedPeopleListByIdCardNumToken', async (req, res) => {
     return;
   }
   const idNum = userStr && userStr.carUserInfo.Account || '';
-  log(290, idNum)
-  const electicCarList = await eleccarService.getCarListByIdNumToken(idCardNumToken, idNum);
+  const electicCarList = await eleccarService.getCarListByIdNumToken(idNum);
+  log(351, electicCarList)
   let result = [];
   if (electicCarList.length > 0) {
-    result = electicCarList.filter(obj => (diffChePaiReg.test(obj.code)));
-
+    result = electicCarList.filter(obj => (diffChePaiReg.test(obj.Code)));
   }
   if (result.length > 0) {
     result = result.map(obj => {
       return {
         "userId": userStr.elecCarUserId || '',
         "eviId": obj.ID || '',
-        "code": eleccar.Code && eleccar.Code.split('(')[0] || '',
+        "code": obj.Code && obj.Code.split('(')[0] || '',
         "registDate": obj.RegistDate,
         "ownerID": obj.OwnerID,
         "ownerName": obj.OwnerName,
