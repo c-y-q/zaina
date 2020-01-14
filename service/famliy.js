@@ -197,7 +197,9 @@ exports.getHomeworkInformList = async (accounts, pageSize, pageIndex) => {
         let homeworkDb = homeworkArr[i];
         const homeAswer = await mongoModel.famlilyHomeworkAnswer.find({
             homeworkId: homeworkDb._id,
-            creator: parentId
+            creator: {
+                $in: parentIds
+            }
         });
         const homework = {
             isSubmitHomework: homeAswer.length > 0,
