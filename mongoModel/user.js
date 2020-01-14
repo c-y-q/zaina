@@ -24,12 +24,9 @@ module.exports = new mongoose.Schema({
     phone: {
       type: String,
     },
-    userId: {
-      type: Schema.Types.ObjectId
-    },
     _id: false
   }],
-  pet:[{
+  pet: [{
     phone: {
       type: String,
     },

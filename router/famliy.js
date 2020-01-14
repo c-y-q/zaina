@@ -14,6 +14,7 @@ router.post("/findChildrenByParentPhone", async (req, res) => {
         let famlilyPhones = carInfoArr.map(obj => obj.phone);
         accounts = accounts.concat(famlilyPhones);
     }
+    log(17, accounts)
     const result = await famlilySerive.findChildrenByParentPhone(accounts);
     res.json({
         status: 200,
@@ -143,11 +144,9 @@ router.post("/familyLogin", async (req, res) => {
                 password: vcode
             }
         });
-        const famlilyUserId = carInfo && carInfo.data._id;
-        await userService.pushFamlilyPhone(account, famlilyUserId)
+        await userService.pushFamlilyPhone(userAccount, account);
         //carToken:请求电车平台需要的token,id
         const tokenParam = {
-            userId: famlilyUserId,
             account,
             uuid: tools.uuid(),
             visitIP: req.ip,
@@ -165,6 +164,7 @@ router.post("/familyLogin", async (req, res) => {
             famlilyToken: token
         });
     } catch (error) {
+        log(168, error)
         res.json({
             status: 1002,
             msg: " 验证码错误"

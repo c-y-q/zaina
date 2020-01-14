@@ -42,14 +42,13 @@ exports.findUserByAccount = async (account) => {
 /**
  * 根据在哪app登录使用的手机号，登录家校惠通，push famlily phone;
  */
-exports.pushFamlilyPhone = async (account, userId) => {
+exports.pushFamlilyPhone = async (userAccount, account) => {
     const result = await mongoModel.user.findOneAndUpdate({
-        userName: account
+        userName: userAccount
     }, {
         $addToSet: {
             famlily: {
-                phone: account,
-                userId: userId
+                phone: account
             }
         }
     }, {
