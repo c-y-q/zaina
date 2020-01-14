@@ -25,7 +25,7 @@ module.exports = new mongoose.Schema({
       type: String,
     },
     userId: {
-      type: String
+      type: Schema.Types.ObjectId
     },
     _id: false
   }]
