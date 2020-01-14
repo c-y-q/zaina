@@ -314,7 +314,7 @@ router.post('/getElecticListByIdCardNumToken', async (req, res) => {
       return {
         "userId": userStr.elecCarUserId || '',
         "eviId": obj.ID || '',
-        "code": eleccar.Code && eleccar.Code.split('(')[0] || '',
+        "code": obj.Code && obj.Code.split('(')[0] || '',
         "registDate": obj.RegistDate,
         "ownerID": obj.OwnerID,
         "ownerName": obj.OwnerName,
