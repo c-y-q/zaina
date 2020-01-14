@@ -24,14 +24,18 @@ router.post('/getPetInfo', async (req, res, next) => {
  */
 router.post("/directBindDogRegNum", async (req, res) => {
   const phone = req.user.account;
-  const {account, vcode} = req.body;
+  const {
+    account,
+    vcode
+  } = req.body;
   if (phone == account) {
     res.json({
       status: 405,
       respMsg: "无法绑定本用户"
     });
+    return;
   }
-  try{
+  try {
     await axios({
       method: "post",
       url: "https://api.hbzner.com/v1/getToken",
@@ -42,10 +46,12 @@ router.post("/directBindDogRegNum", async (req, res) => {
       }
     });
   } catch (error) {
+    log(45, error)
     res.json({
       status: 1002,
       msg: " 验证码错误"
     })
+    return;
   }
 
   let isfree = await petService.isPetMaster(account);
@@ -54,6 +60,7 @@ router.post("/directBindDogRegNum", async (req, res) => {
       status: 405,
       respMsg: "验证失败!"
     });
+    return;
   }
   // const flag = await petService.isBinwxRef(
   //   isfree[0].dogRegNum,
