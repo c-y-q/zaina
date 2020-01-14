@@ -33,7 +33,8 @@ exports.findUserByAccount = async (account) => {
     }, {
         _id: 1,
         car: 1,
-        family: 1
+        family: 1,
+        pet: 1
     })
     return result || '';
 }

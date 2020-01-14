@@ -17,7 +17,8 @@ module.exports = new mongoose.Schema({
     },
     userId: {
       type: String
-    }
+    },
+    _id: false
   }],
   family: [{
     phone: {
@@ -25,7 +26,14 @@ module.exports = new mongoose.Schema({
     },
     userId: {
       type: String
-    }
+    },
+    _id: false
+  }],
+  pet:[{
+    phone: {
+      type: String,
+    },
+    _id: false
   }]
 }, {
   collection: "zaina_app_user"
