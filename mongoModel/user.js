@@ -28,6 +28,12 @@ module.exports = new mongoose.Schema({
       type: Schema.Types.ObjectId
     },
     _id: false
+  }],
+  pet:[{
+    phone: {
+      type: String,
+    },
+    _id: false
   }]
 }, {
   collection: "zaina_app_user"

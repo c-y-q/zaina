@@ -25,7 +25,7 @@ exports.getPetInfo = async (phone) => {
     p.area_code = s.CODE 
     AND m.id = p.master_id 
     AND p.pet_state IN ( 1, 3 ) 
-    AND m.contact_phone = ? `;
+    AND m.contact_phone IN ( ? ) `;
     const result = await db.query(sql, [phone]);
     for (let i = 0; i < result.length; i++) {
       result[i].expire_time = moment(result[i].expire_time.substr(0,7)).format('YYYY-MM-DD');
@@ -82,14 +82,24 @@ exports.judePetExists = async id => {
   return tools.toTuoFeng(result);
 };
 
-exports.directBindDogRegNum = async (petRegId, dogRegNum) => {
-  const db = await mysqlUtil();
-  const wx_pet_ref_sql = " insert into wx_binding_petinf set ? ";
-  const wxPubPetInfRel = {
-      pet_reg_id: petRegId,
-      dog_reg_num: dogRegNum
-  };
-  const result = await db.query(wx_pet_ref_sql, wxPubPetInfRel);
-  db.close();
+exports.directBindDogRegNum = async (account, phone) => {
+  const result = await mongoModel.user.findOneAndUpdate({
+    userName: phone
+  },{
+    $addToSet:{
+        pet: {
+          phone: account
+        }
+    }
+  })
+  // const db = await mysqlUtil();
+  // const wx_pet_ref_sql = " insert into wx_binding_petinf set ? ";
+  // const wxPubPetInfRel = {
+  //     pet_reg_id: petRegId,
+  //     dog_reg_num: dogRegNum,
+  //     phone: phone
+  // };
+  // const result = await db.query(wx_pet_ref_sql, wxPubPetInfRel);
+  // db.close();
   return result;
 };
