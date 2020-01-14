@@ -329,5 +329,5 @@ async function getParentId(account) {
     }, {
         _id: 1
     })
-    return result && result._id || '';
+    return result && mongoose.Types.ObjectId(result._id) || '';
 }
