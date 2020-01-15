@@ -28,6 +28,7 @@ router.post("/directBindDogRegNum", async (req, res) => {
     account,
     vcode
   } = req.body;
+  console.log(31, phone, account);
   if (phone == account) {
     res.json({
       status: 405,
@@ -58,7 +59,7 @@ router.post("/directBindDogRegNum", async (req, res) => {
   if (!isfree.length) {
     res.json({
       status: 405,
-      respMsg: "验证失败!"
+      respMsg: "暂无犬证!"
     });
     return;
   }
