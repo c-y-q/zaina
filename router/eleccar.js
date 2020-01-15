@@ -129,6 +129,8 @@ router.post("/lockElectricCar", async (req, res) => {
  */
 router.post('/getEeticCarNoticeList', async (req, res) => {
   const account = req.user.account;
+  let pageSize = parseInt(req.body.pageSize) || 10;
+  let pageIndex = parseInt(req.body.pageIndex) || 1;
   const userRes = await userService.findUserByAccount(account);
   const carInfoArr = userRes && userRes.car || [];
   if (!carInfoArr.length) {
@@ -139,7 +141,7 @@ router.post('/getEeticCarNoticeList', async (req, res) => {
     return;
   }
   const idNums = carInfoArr.map(obj => obj.idNum);
-  const noticeList = await eleccarService.getEeticCarNoticeList(idNums);
+  const noticeList = await eleccarService.getEeticCarNoticeList(idNums, pageSize, pageIndex);
   const result = [];
   if (noticeList.length > 0) {
     for (let rs of noticeList) {

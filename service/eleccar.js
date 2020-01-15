@@ -89,7 +89,13 @@ exports.lockElectricCar = async (userId, eviId, lockState) => {
 /**
  * 电车卫士消息列表
  */
-exports.getEeticCarNoticeList = async (idNums) => {
+exports.getEeticCarNoticeList = async (idNums, pageSize, pageIndex) => {
+  if (pageIndex < 1) {
+    pageIndex = 1;
+  }
+  if (pageSize < 0) {
+    pageSize = 10;
+  }
   const pool = await msslqUtil();
   let idNumStr = '';
   if (idNums.length > 0) {
@@ -112,7 +118,9 @@ exports.getEeticCarNoticeList = async (idNums) => {
     LEFT JOIN evi.Vehicle v ON t.VehicleID = v.ID 
   WHERE
     t.ID > 0 
-    AND v.State = 1) b,pub.Device p where p.id = b.DeviceID and b.OwnerId in (${idNumStr}) order by b.AlarmTime desc`;
+    AND v.State = 1) b,pub.Device p where p.id = b.DeviceID and b.OwnerId in (${idNumStr}) order by b.AlarmTime desc
+    OFFSET ${pageSize *(pageIndex -1)} ROWS FETCH NEXT ${pageSize} ROWS ONLY `;
+  log(123, sql)
   const result = await pool.query(sql);
   return result.recordsets.length && result.recordsets.flat() || [];
 }
