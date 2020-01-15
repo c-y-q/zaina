@@ -31,7 +31,7 @@ router.post("/directBindDogRegNum", async (req, res) => {
   if (phone == account) {
     res.json({
       status: 405,
-      respMsg: "无法绑定本用户"
+      msg: "无法绑定本用户"
     });
     return;
   }
@@ -58,7 +58,7 @@ router.post("/directBindDogRegNum", async (req, res) => {
   if (!isfree.length) {
     res.json({
       status: 405,
-      respMsg: "暂无犬证!"
+      msg: "暂无犬证!"
     });
     return;
   }
@@ -69,14 +69,14 @@ router.post("/directBindDogRegNum", async (req, res) => {
   // if (flag.length > 0) {
   //   throw {
   //     status: 405,
-  //     respMsg: " 已绑定过该号码，请勿重复绑定"
+  //     msg: " 已绑定过该号码，请勿重复绑定"
   //   };
   // }
   // const judePetExists = await petService.judePetExists(isfree[0].id);
   // if (!judePetExists) {
   //   throw {
   //     status: 405,
-  //     respMsg: " the dog not exists"
+  //     msg: " the dog not exists"
   //   };
   // }
   await petService.directBindDogRegNum(
