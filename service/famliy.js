@@ -76,18 +76,6 @@ exports.findChildrenByParentPhone = async (accounts) => {
     return classesInfos;
 }
 
-exports.findmoney = async (account) => {
-
-    const result = await mongoModel.user.findOne({
-        userName: account
-    }, {
-        _id: 0,
-        'eMoney.money': 1,
-        'eMoney.signedDate': 1
-    })
-    return result && result.eMoney;
-}
-
 exports.queryStudentsList = async (accounts) => {
     let parentIds = [];
     for (let account of accounts) {

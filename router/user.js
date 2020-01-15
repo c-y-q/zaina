@@ -10,14 +10,12 @@ const famlilySerive = require('../service/famliy');
 router.post("/findUserInfo", async (req, res) => {
   const account = req.user.account;
   const pet = await petService.getPetNum(account);
-  // 查询本用户金币
-  const signmoney = await famlilySerive.findmoney(account);
-  const user = await userService.findUser(account);
-  user.money = signmoney && signmoney.money;
+  //查询本用户金币
+  let user = await userService.findUser(account);
   // 判断今日是否可以签到
   let panduan = true;
   let todayDate = moment(new Date()).utcOffset(8).format('YYYY-MM-DD');
-  if (todayDate < signmoney.signedDate) {
+  if (todayDate < user.eMoney.signedDate) {
     panduan = false;
   }
   const family = await famlilySerive.queryStudentsList(account);
