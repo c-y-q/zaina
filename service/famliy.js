@@ -78,14 +78,14 @@ exports.findChildrenByParentPhone = async (accounts) => {
 
 exports.findmoney = async (account) => {
 
-    const result = await mongoModel.famlilyUser.findOne({
-        account: account
+    const result = await mongoModel.user.findOne({
+        userName: account
     }, {
         _id: 0,
         'eMoney.money': 1,
         'eMoney.signedDate': 1
     })
-    return result.eMoney;
+    return result && result.eMoney;
 }
 
 exports.queryStudentsList = async (accounts) => {
@@ -311,16 +311,12 @@ exports.getGongGaoInformList = async (accounts, pageSize, pageIndex) => {
     return resTempate;
 }
 exports.sign = async (account) => {
-    const parentId = await getParentId(account);
-    if (!parentId) {
-        return [];
-    }
     let todayDate = moment(new Date()).utcOffset(8).format('YYYY-MM-DD');
     let addDate = moment(new Date()).utcOffset(8).add(1, 'days').format('YYYY-MM-DD');
-    const result = mongoModel.famlilyUser.findOneAndUpdate({
-        _id: parentId,
+    const result = mongoModel.user.findOneAndUpdate({
+        userName: account,
         "eMoney.signedDate": {
-            $lte: todayDate
+                $lte: todayDate
         }
     }, {
         $inc: {

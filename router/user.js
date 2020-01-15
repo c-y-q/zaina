@@ -13,7 +13,7 @@ router.post("/findUserInfo", async (req, res) => {
   // 查询本用户金币
   const signmoney = await famlilySerive.findmoney(account);
   const user = await userService.findUser(account);
-  user.money = signmoney.money;
+  user.money = signmoney && signmoney.money;
   // 判断今日是否可以签到
   let panduan = true;
   let todayDate = moment(new Date()).utcOffset(8).format('YYYY-MM-DD');
