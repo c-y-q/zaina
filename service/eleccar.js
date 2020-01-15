@@ -46,7 +46,6 @@ exports.getElecticCarUserInfo = async (carUserId, carToken) => {
       authorization: carToken
     }
   });
-  log(42, result.data)
   return result && result.data;
 };
 
@@ -113,7 +112,7 @@ exports.getEeticCarNoticeList = async (idNums) => {
     LEFT JOIN evi.Vehicle v ON t.VehicleID = v.ID 
   WHERE
     t.ID > 0 
-    AND v.State = 1) b,pub.Device p where p.id = b.DeviceID and b.OwnerId in (${idNumStr}) order by b.AlarmTime`;
+    AND v.State = 1) b,pub.Device p where p.id = b.DeviceID and b.OwnerId in (${idNumStr}) order by b.AlarmTime desc`;
   const result = await pool.query(sql);
   return result.recordsets.length && result.recordsets.flat() || [];
 }
@@ -163,35 +162,3 @@ exports.getCarListByIdNumToken = async (idNum) => {
   });
   return result.data.Data;
 }
-
-/**
- * sqlserver获取电车列表,已废弃，2020-01-13 15:35:00
- */
-// exports.queryCarListMssql = async (idnums) => {
-//   if (idnums.length == 0 || !Array.isArray(idnums)) {
-//     return [];
-//   }
-//   const idNumString = idnums.join(',');
-//   const querySql = `SELECT
-//               a.ID AS UserID,
-//               v.ID AS EviID,
-//               v.Code,
-//               v.EPC,
-//               v.OwnerID,
-//               v.OwnerName,
-//               v.RegistDate,
-//               ifnull(l.State,0) State,
-//               t.Battery 
-//             FROM
-//               RFID.evi.Vehicle v
-//               LEFT JOIN rfid.evi.lockdispatch l ON v.ID = l.VehicleID
-//               LEFT JOIN rfid.sso.appuser a ON v.ownerid = a.account
-//               LEFT JOIN rfid.evi.TagBattery t ON v.EPC = t.VehicleEpc 
-//             WHERE
-//               v.state = 1 
-//               AND v.OwnerID IN (${idNumString}) 
-//             ORDER BY
-//               v.id`;
-//   const result = await msslqUtil.query(querySql);
-//   return result.recordsets;
-// }
