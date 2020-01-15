@@ -23,7 +23,6 @@ app.use(express.json()).use(
     })
 );
 app.use(cookieParser());
-app.use(cookieParser());
 app.use(
     bodyParser.urlencoded({
         limit: "100mb",
