@@ -128,21 +128,26 @@ router.post("/lockElectricCar", async (req, res) => {
  * 电车卫士消息列表
  */
 router.post('/getEeticCarNoticeList', async (req, res) => {
-  const mobile = req.user.account;
-  const carToken = req.user.cartoken;
-  const page = parseInt(req.body.page) || 1;
-  const noticeList = await eleccarService.getEeticCarNoticeList(mobile, page, carToken);
-  const regChepai = /^[A-Z]{2}\d{6,}/;
-  const regTime = /\d{4}\-\d{2}\-\d{2}\s\d{2}\:\d{2}\:\d{2}/;
+  const account = req.user.account;
+  const userRes = await userService.findUserByAccount(account);
+  const carInfoArr = userRes && userRes.car || [];
+  if (!carInfoArr.length) {
+    res.json({
+      status: 200,
+      result: []
+    });
+    return;
+  }
+  const idNums = carInfoArr.map(obj => obj.idNum);
+  const noticeList = await eleccarService.getEeticCarNoticeList(idNums);
   const result = [];
   if (noticeList.length > 0) {
     for (let rs of noticeList) {
-      let content = rs.content;
       let notice = {
-        title: rs.title || '',
-        chePai: content.match(regChepai) && content.match(regChepai)[0] || content,
-        noticeTime: content.match(regTime) && content.match(regTime)[0] || content,
-        noticeAddr: content.substring(content.lastIndexOf(':') + 1) || content,
+        title: '上锁报警' || '',
+        chePai: rs.Code,
+        noticeTime: moment(new Date(rs.AlarmTime)).format("YYYY/MM/DD HH:mm:ss"),
+        noticeAddr: rs.address,
       }
       result.push(notice);
     }

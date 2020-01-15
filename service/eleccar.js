@@ -87,20 +87,35 @@ exports.lockElectricCar = async (userId, eviId, lockState) => {
   });
   return result.data;
 };
-
 /**
  * 电车卫士消息列表
  */
-exports.getEeticCarNoticeList = async (mobile, page, carToken) => {
-  const url = `https://api.hbzner.com/v1/notices/${mobile}/pages/${page}`;
-  const result = await axios({
-    method: "get",
-    url: url,
-    headers: {
-      authorization: carToken
+exports.getEeticCarNoticeList = async (idNums) => {
+  const pool = await msslqUtil();
+  let idNumStr = '';
+  if (idNums.length > 0) {
+    for (let id of idNums) {
+      idNumStr += `'${id}',`;
     }
-  });
-  return result.data || [];
+    idNumStr = idNumStr.slice(0, -1);
+  }
+  const sql = `select b.*,p.address from (SELECT
+    t.DeviceID,
+    t.ID,
+    t.VehicleEpc,
+    t.AlarmTime,
+    v.Code,
+    v.OwnerName,
+    v.OwnerId,
+    v.OwnerPhone 
+  FROM
+    evi.LockAlarm t
+    LEFT JOIN evi.Vehicle v ON t.VehicleID = v.ID 
+  WHERE
+    t.ID > 0 
+    AND v.State = 1) b,pub.Device p where p.id = b.DeviceID and b.OwnerId in (${idNumStr}) order by b.AlarmTime`;
+  const result = await pool.query(sql);
+  return result.recordsets.length && result.recordsets.flat() || [];
 }
 
 exports.getEleticCarLastPoint = async (chePaiCode) => {
