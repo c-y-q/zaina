@@ -5,7 +5,9 @@ exports.findChildrenByParentPhone = async (accounts) => {
     let parentIds = [];
     for (let account of accounts) {
         let parentId = await getParentId(account);
-        parentIds.push(parentId);
+        if (parentId) {
+            parentIds.push(parentId);
+        }
     }
     if (!parentIds.length) {
         return [];
@@ -90,7 +92,9 @@ exports.queryStudentsList = async (accounts) => {
     let parentIds = [];
     for (let account of accounts) {
         let parentId = await getParentId(account);
-        parentIds.push(parentId);
+        if (parentId) {
+            parentIds.push(parentId);
+        }
     }
     if (!parentIds.length) {
         return [];
@@ -152,7 +156,9 @@ exports.getHomeworkInformList = async (accounts, pageSize, pageIndex) => {
     let parentIds = [];
     for (let account of accounts) {
         let parentId = await getParentId(account);
-        parentIds.push(parentId);
+        if (parentId) {
+            parentIds.push(parentId);
+        }
     }
     if (!parentIds.length) {
         return resTempate;
@@ -243,7 +249,9 @@ exports.getGongGaoInformList = async (accounts, pageSize, pageIndex) => {
     let parentIds = [];
     for (let account of accounts) {
         let parentId = await getParentId(account);
-        parentIds.push(parentId);
+        if (parentId) {
+            parentIds.push(parentId);
+        }
     }
     if (!parentIds.length) {
         return resTempate;
@@ -331,5 +339,6 @@ async function getParentId(account) {
     }, {
         _id: 1
     })
-    return result && mongoose.Types.ObjectId(result._id) || '';
+    let resId = result && result._id && mongoose.Types.ObjectId(result._id);
+    return resId;
 }

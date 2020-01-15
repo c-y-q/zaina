@@ -355,7 +355,6 @@ router.post('/getProtectedPeopleListByIdCardNumToken', async (req, res) => {
   }
   const idNum = userStr && userStr.carUserInfo.Account || '';
   const electicCarList = await eleccarService.getCarListByIdNumToken(idNum);
-  log(351, electicCarList)
   let result = [];
   if (electicCarList.length > 0) {
     result = electicCarList.filter(obj => (diffChePaiReg.test(obj.Code)));
