@@ -29,10 +29,11 @@ exports.getElecCarnumber = async (idNum) => {
       }
     }
   });
-  if (result.data.length == 0) {
+  if (result.data.Data.length == 0) {
     return '暂无车辆';
   }
-  return (result && result.data.Data[0].Code) || "暂无车辆";
+
+  return result && result.data.Data[0].Code || "暂无车辆";
 };
 
 /**
