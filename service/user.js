@@ -7,7 +7,7 @@ exports.findUser = async (account) => {
         }
     }, {
         upsert: true
-    })
+    });
 }
 /**
  * 根据在哪app登录使用的手机号，找到，push car_idNum ,car_userId;

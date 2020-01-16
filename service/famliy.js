@@ -85,7 +85,7 @@ exports.queryStudentsList = async (accounts) => {
         }
     }
     if (!parentIds.length) {
-        return [];
+        return '暂无信息';
     }
     const classesParents = await mongoModel.famlilyClasses.aggregate([{
             '$unwind': '$parents'
@@ -116,7 +116,7 @@ exports.queryStudentsList = async (accounts) => {
 
         result.push(StudentInfo[0])
     }
-
+    console.log(119, result);
     if (result.length == 0) {
         return '暂无信息';
     }
