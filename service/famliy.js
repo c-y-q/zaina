@@ -299,19 +299,27 @@ exports.getGongGaoInformList = async (accounts, pageSize, pageIndex) => {
     return resTempate;
 }
 exports.sign = async (account) => {
-    let todayDate = moment(new Date()).utcOffset(8).format('YYYY-MM-DD');
-    let addDate = moment(new Date()).utcOffset(8).add(1, 'days').format('YYYY-MM-DD');
-    const result = mongoModel.user.findOneAndUpdate({
-        userName: account,
-        "eMoney.signedDate": {
-                $lte: todayDate
-        }
-    }, {
-        $inc: {
-            "eMoney.money": 10
-        },
-        "eMoney.signedDate": addDate
-    });
+    const ifUser = mongoModel.user.findOne({userName: account});
+    let result = '';
+    if (ifUser) {
+        let todayDate = moment(new Date()).utcOffset(8).format('YYYY-MM-DD');
+        let addDate = moment(new Date()).utcOffset(8).add(1, 'days').format('YYYY-MM-DD');
+        result = mongoModel.user.findOneAndUpdate({
+            userName: account,
+            "eMoney.signedDate": {
+                    $lte: todayDate
+            }
+        }, {
+            $inc: {
+                "eMoney.money": 10
+            },
+            "eMoney.signedDate": addDate
+        });
+    } else {
+        result = mongoModel.user.insert({userName: account});
+    }
+
+
     return result;
 }
 /**
