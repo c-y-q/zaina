@@ -310,7 +310,7 @@ exports.sign = async (account) => {
                 {'eMoney.money': 10, 
                  'eMoney.signedDate': addDate});
             return result;
-        }
+        } 
         result = mongoModel.user.findOneAndUpdate({
             userName: account,
             "eMoney.signedDate": {
