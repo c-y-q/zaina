@@ -3,7 +3,9 @@ exports.findUser = async (account) => {
         userName: account
     }, {
         $set: {
-            userName: account
+            userName: account,
+            "eMoney.money": 0,
+            "eMoney.signedDate": moment(new Date()).utcOffset(0).format("YYYY-MM-DD")
         }
     }, {
         upsert: true
