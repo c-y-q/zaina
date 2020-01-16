@@ -6,7 +6,8 @@ exports.findUser = async (account) => {
             userName: account
         }
     }, {
-        upsert: true
+        upsert: true,
+        setDefaultsOnInsert: true
     });
 }
 /**
