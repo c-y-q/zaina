@@ -299,20 +299,9 @@ exports.getGongGaoInformList = async (accounts, pageSize, pageIndex) => {
     return resTempate;
 }
 exports.sign = async (account) => {
-    const ifUser = await mongoModel.user.findOne({userName: account});
-    console.log(303, ifUser);
-    let result = '';
     let todayDate = moment(new Date()).utcOffset(8).format('YYYY-MM-DD');
     let addDate = moment(new Date()).utcOffset(8).add(1, 'days').format('YYYY-MM-DD');
-
-        // if (ifUser[0].eMoney == 'undefined') {
-        //     result = await mongoModel.user.findOneAndUpdate(
-        //         {userName: account},
-        //         {'eMoney.money': 10, 
-        //          'eMoney.signedDate': addDate});
-        //     return result;
-        // } 
-        result = await mongoModel.user.findOneAndUpdate({
+    let result = await mongoModel.user.findOneAndUpdate({
             userName: account,
             "eMoney.signedDate": {
                     $lte: todayDate
