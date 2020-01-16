@@ -301,9 +301,9 @@ exports.getGongGaoInformList = async (accounts, pageSize, pageIndex) => {
 exports.sign = async (account) => {
     const ifUser = mongoModel.user.findOne({userName: account});
     let result = '';
-    let todayDate = '';
-    if (ifUser) {
-        todayDate = moment(new Date()).utcOffset(8).format('YYYY-MM-DD');
+    let todayDate = moment(new Date()).utcOffset(8).format('YYYY-MM-DD');
+    if (ifUser.length > 0) {
+
         let addDate = moment(new Date()).utcOffset(8).add(1, 'days').format('YYYY-MM-DD');
         result = mongoModel.user.findOneAndUpdate({
             userName: account,
@@ -317,7 +317,12 @@ exports.sign = async (account) => {
             "eMoney.signedDate": addDate
         });
     } else {
-        result = mongoModel.user.insert({userName: account, 'eMoney.money': 10, 'eMoney.signedDate': todayDate});
+        result = mongoModel.user.findOneAndUpdate(
+            {userName: account},
+            {userName: account,
+                 'eMoney.money': 10, 
+                 'eMoney.signedDate': todayDate},
+            {upsert: true});
     }
 
 
