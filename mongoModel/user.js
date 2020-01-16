@@ -31,7 +31,21 @@ module.exports = new mongoose.Schema({
       type: String,
     },
     _id: false
-  }]
+  }],
+  eMoney: {
+    money: { 
+      type: Number, 
+      default: 0, 
+      required: true },
+    signedDate: {
+      type: String,
+      default: () =>
+        moment(new Date())
+          .utcOffset(0)
+          .format("YYYY-MM-DD"),
+      required: true
+    }
+  }
 }, {
   collection: "zaina_app_user"
 });

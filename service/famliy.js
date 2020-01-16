@@ -76,18 +76,6 @@ exports.findChildrenByParentPhone = async (accounts) => {
     return classesInfos;
 }
 
-exports.findmoney = async (account) => {
-
-    const result = await mongoModel.famlilyUser.findOne({
-        account: account
-    }, {
-        _id: 0,
-        'eMoney.money': 1,
-        'eMoney.signedDate': 1
-    })
-    return result.eMoney;
-}
-
 exports.queryStudentsList = async (accounts) => {
     let parentIds = [];
     for (let account of accounts) {
@@ -97,7 +85,7 @@ exports.queryStudentsList = async (accounts) => {
         }
     }
     if (!parentIds.length) {
-        return [];
+        return '暂无信息';
     }
     const classesParents = await mongoModel.famlilyClasses.aggregate([{
             '$unwind': '$parents'
@@ -128,7 +116,7 @@ exports.queryStudentsList = async (accounts) => {
 
         result.push(StudentInfo[0])
     }
-
+    console.log(119, result);
     if (result.length == 0) {
         return '暂无信息';
     }
@@ -311,23 +299,32 @@ exports.getGongGaoInformList = async (accounts, pageSize, pageIndex) => {
     return resTempate;
 }
 exports.sign = async (account) => {
-    const parentId = await getParentId(account);
-    if (!parentId) {
-        return [];
-    }
+    const ifUser = mongoModel.user.findOne({userName: account});
+    let result = '';
     let todayDate = moment(new Date()).utcOffset(8).format('YYYY-MM-DD');
     let addDate = moment(new Date()).utcOffset(8).add(1, 'days').format('YYYY-MM-DD');
-    const result = mongoModel.famlilyUser.findOneAndUpdate({
-        _id: parentId,
-        "eMoney.signedDate": {
-            $lte: todayDate
-        }
-    }, {
-        $inc: {
-            "eMoney.money": 10
-        },
-        "eMoney.signedDate": addDate
-    });
+
+        if (ifUser[0].eMoney == 'undefined') {
+            result = mongoModel.user.findOneAndUpdate(
+                {userName: account},
+                {'eMoney.money': 10, 
+                 'eMoney.signedDate': addDate});
+            return result;
+        } 
+        result = mongoModel.user.findOneAndUpdate({
+            userName: account,
+            "eMoney.signedDate": {
+                    $lte: todayDate
+            }
+        }, {
+            $inc: {
+                "eMoney.money": 10
+            },
+            "eMoney.signedDate": addDate
+        });
+
+
+
     return result;
 }
 /**
