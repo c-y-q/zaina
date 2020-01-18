@@ -1,0 +1,8 @@
+test
+node_modules
+public
+.DS_Store
+.vscode
+package-lock.json
+.git
+logs
