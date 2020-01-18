@@ -1,15 +1,15 @@
 /**
  * 获取电车列表
  */
-exports.getElecCarList = async idNum => {
+exports.getElecCarList = async (idNum) => {
   const result = await axios({
     method: "POST",
     url: `https://app.hbzner.com/api/Vehicle/QueryAllList`,
     data: {
-      key: "",
-      UserID: "",
-      Data: {
-        Account: idNum
+      "key": "",
+      "UserID": "",
+      "Data": {
+        "Account": idNum
       }
     }
   });
@@ -17,23 +17,23 @@ exports.getElecCarList = async idNum => {
   return (result && result.data.Data) || "";
 };
 
-exports.getElecCarnumber = async idNum => {
+exports.getElecCarnumber = async (idNum) => {
   const result = await axios({
     method: "POST",
     url: `https://app.hbzner.com/api/Vehicle/QueryAllList`,
     data: {
-      key: "",
-      UserID: "",
-      Data: {
-        Account: idNum
+      "key": "",
+      "UserID": "",
+      "Data": {
+        "Account": idNum
       }
     }
   });
   if (result.data.Data.length == 0) {
-    return "暂无车辆";
+    return '暂无车辆';
   }
 
-  return (result && result.data.Data[0].Code) || "暂无车辆";
+  return result && result.data.Data[0].Code || "暂无车辆";
 };
 
 /**
@@ -78,10 +78,10 @@ exports.lockElectricCar = async (userId, eviId, lockState) => {
     url: "https://app.hbzner.com/api/Vehicle/Lock",
     data: {
       key: null,
-      UserId: `${userId}`,
-      Data: {
-        ID: `${eviId}`,
-        Lock: lockState
+      "UserId": `${userId}`,
+      "Data": {
+        "ID": `${eviId}`,
+        "Lock": lockState
       }
     }
   });
@@ -98,7 +98,7 @@ exports.getEeticCarNoticeList = async (idNums, pageSize, pageIndex) => {
     pageSize = 10;
   }
   const pool = await msslqUtil();
-  let idNumStr = "";
+  let idNumStr = '';
   if (idNums.length > 0) {
     for (let id of idNums) {
       idNumStr += `'${id}',`;
@@ -120,56 +120,54 @@ exports.getEeticCarNoticeList = async (idNums, pageSize, pageIndex) => {
   WHERE
     t.ID > 0 
     AND v.State = 1) b,pub.Device p where p.id = b.DeviceID and b.OwnerId in (${idNumStr}) order by b.AlarmTime desc
-    OFFSET ${pageSize *
-      (pageIndex - 1)} ROWS FETCH NEXT ${pageSize} ROWS ONLY `;
+    OFFSET ${pageSize *(pageIndex -1)} ROWS FETCH NEXT ${pageSize} ROWS ONLY `;
+  log(123, sql)
   const result = await pool.query(sql);
-  return (result.recordsets.length && result.recordsets.flat()) || [];
-};
+  return result.recordsets.length && result.recordsets.flat() || [];
+}
 
-exports.getEleticCarLastPoint = async chePaiCode => {
-  const url = `https://app.hbzner.com/api/Gis/GetLastTrack?code=${encodeURIComponent(
-    chePaiCode
-  )}`;
+exports.getEleticCarLastPoint = async (chePaiCode) => {
+  const url = `https://app.hbzner.com/api/Gis/GetLastTrack?code=${encodeURIComponent(chePaiCode)}`;
   const result = await axios({
     method: "get",
     url: url
   });
   return result.data;
-};
+}
 
 /**
  * 获取电车平台token
  */
 exports.getEleticCarUserInfo = async (idNum, password) => {
   const result = await axios({
-    method: "POST",
-    url: "https://app.hbzner.com/api/User/Login",
+    method: 'POST',
+    url: 'https://app.hbzner.com/api/User/Login',
     data: {
-      key: "",
-      UserID: "",
-      Data: {
-        Account: `${idNum}`,
-        Password: `${password}`
+      "key": "",
+      "UserID": "",
+      "Data": {
+        "Account": `${idNum}`,
+        "Password": `${password}`
       }
     }
-  });
+  })
   return result;
-};
+}
 
 /**
  * idNumberToken获取列表
  */
-exports.getCarListByIdNumToken = async idNum => {
+exports.getCarListByIdNumToken = async (idNum) => {
   const result = await axios({
     method: "post",
     url: `https://app.hbzner.com/api/Vehicle/QueryAllList`,
     data: {
-      key: "",
-      UserID: "",
-      Data: {
-        Account: idNum
+      "key": "",
+      "UserID": "",
+      "Data": {
+        "Account": idNum
       }
     }
   });
   return result.data.Data;
-};
+}
